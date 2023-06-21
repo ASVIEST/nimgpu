@@ -15,3 +15,4 @@ task generate, "generate webgpu bindings":
   exec "nim c -r -d:release generator/gen_wgpu"
 
 taskRequires "generate", "shell"
+taskRequires "generate", "https://github.com/nim-lang/c2nim"
