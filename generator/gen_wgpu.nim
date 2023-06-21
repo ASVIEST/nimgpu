@@ -4,9 +4,12 @@ import std/[tempfiles, streams, os]
 import helpers
 
 const
-  wgpuDir = "wgpu-native"
+  generatorDir = currentSourcePath.parentDir
+  wgpuDir = generatorDir/"wgpu-native"
   wgpuLibPath = wgpuDir/"target"/"release"
-  projectName = currentSourcePath.parentDir.parentDir.lastPathPart
+  projectDir = currentSourcePath.parentDir.parentDir
+  projectName = projectDir.lastPathPart
+  outDir = projectDir/"src"/projectName/"wgpu_native"
 
 type
   Generator = object
@@ -212,7 +215,7 @@ proc runC2Nim(self; s: string, resPath: string = s)=
 
 proc copyWgpuNativeDir(self)=
   #copy only necessary files from wgpu-native dir 
-  const dir = fmt"../src/{projectName}/wgpu_native/{wgpuDir}"
+  const dir = outDir/"wgpu-native"
   createDir(dir)
   
   createDir(dir/"ffi")
@@ -239,7 +242,7 @@ proc copyWgpuNativeDir(self)=
 
 proc copyGeneratedNimFiles(self; paths: varargs[string])=
   for i in paths:
-    copyFileToDir(i, fmt"../src/{projectName}/wgpu_native")
+    copyFileToDir(i, outDir)
 
   inc self.step
 
@@ -259,9 +262,4 @@ with generator:
   copyWgpuNativeDir
   copyGeneratedNimFiles resPathWebgpu, resPathWgpu
 
-import print
-print generator
-
 assert generator.step == Final
-# shell:
-#   cat ($p)
