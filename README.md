@@ -1,0 +1,2 @@
+# nimgpu
+Nim webgpu bindings
