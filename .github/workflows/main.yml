@@ -7,6 +7,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
       
       - name: Setup Nim environment
         uses: jiro4989/setup-nim-action@v1
@@ -20,4 +22,4 @@ jobs:
           toolchain: stable
 
       - name: Generate bindings
-        run: nimble generate
+        run: nimble generate -y
