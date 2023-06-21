@@ -20,4 +20,4 @@ jobs:
           toolchain: stable
 
       - name: Generate bindings
-        run: nimble generate
+        run: nimble generate -y
