@@ -54,20 +54,16 @@ proc buildWgpuNativeLib(self)=
   inc self.step
 
 const linkLib = """
+import std/[os, strutils]
+const wgpuLib = currentSourcePath.parentDir/"wgpu-native"/"target"/"release/"
+
 when defined(WGPU_NATIVE_DYNLIB):
-  const wgpudll = "$wgpuLibPath$/" & (
-    when defined(windows):
-      "./wgpu_native.dll"
-    elif defined(macosx):
-      "./libwgpu_native.dylib"
-    else:
-      "./libwgpu_native.so"
-  )
+  const wgpudll = wgpuLib & "./" & (DynlibFormat % "wgpu_native")
   
   {.pragma: clib, cdecl, dynlib: wgpudll.}
 else:
   {.pragma: clib.}
-  {.passl: "$wgpuLibPath$/" & "./libwgpu_native.a"}
+  {.passl: wgpuLib & "./libwgpu_native.a"}
 """.fmt('$', '$')
 
 proc preprocWebgpuHeader(self): string=
