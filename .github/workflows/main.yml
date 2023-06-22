@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'generator/**'
+  workflow_dispatch:
 
 jobs:
   main:
