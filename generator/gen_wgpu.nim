@@ -6,10 +6,13 @@ import helpers
 const
   generatorDir = currentSourcePath.parentDir
   wgpuDir = generatorDir/"wgpu-native"
-  wgpuLibPath = wgpuDir/"target"/"release"
+  
   projectDir = currentSourcePath.parentDir.parentDir
   projectName = projectDir.lastPathPart
   outDir = projectDir/"src"/projectName/"wgpu_native"
+
+
+  wgpuLibPath = ".."/"src"/projectName/"wgpu_native"/"wgpu-native"/"target"/"release"  
 
 type
   Generator = object
@@ -51,8 +54,6 @@ proc buildWgpuNativeLib(self)=
   inc self.step
 
 const linkLib = """
-{.define: WGPU_NATIVE_DYNLIB.}
-
 when defined(WGPU_NATIVE_DYNLIB):
   const wgpudll = "$wgpuLibPath$/" & (
     when defined(windows):
@@ -98,8 +99,9 @@ $linkLib$
 
 @#
 
-#header "$headerPath$"
 #clibuserpragma
+#mangle SIZE_MAX "sizeof(csize_t)"
+#stdints
 
 #define WGPU_EXPORT
 
@@ -108,9 +110,6 @@ $linkLib$
 #define WGPU_STRUCTURE_ATTRIBUTE
 #define WGPU_FUNCTION_ATTRIBUTE
 #define WGPU_NULLABLE
-
-#mangle SIZE_MAX "sizeof(csize_t)"
-#stdints
 
 #@
 type
@@ -154,7 +153,6 @@ proc preprocWgpuHeader(self): string=
 
   const
     headerPrelude = """
-#header "$headerPath$"
 #skipinclude
 #stdints
 #clibuserpragma
