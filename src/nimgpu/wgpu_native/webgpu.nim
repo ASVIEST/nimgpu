@@ -1,9 +1,7 @@
 {.experimental: "codeReordering".}
 
-{.define: WGPU_NATIVE_DYNLIB.}
-
 when defined(WGPU_NATIVE_DYNLIB):
-  const wgpudll = "wgpu-native/target/release/" & (
+  const wgpudll = "../src/nimgpu/wgpu_native/wgpu-native/target/release/" & (
     when defined(windows):
       "./wgpu_native.dll"
     elif defined(macosx):
@@ -15,7 +13,7 @@ when defined(WGPU_NATIVE_DYNLIB):
   {.pragma: clib, cdecl, dynlib: wgpudll.}
 else:
   {.pragma: clib.}
-  {.passl: "wgpu-native/target/release/" & "./libwgpu_native.a"}
+  {.passl: "../src/nimgpu/wgpu_native/wgpu-native/target/release/" & "./libwgpu_native.a"}
 
 
 type
@@ -53,23 +51,23 @@ const
 
 type
   WGPUFlags* = uint32
-  WGPUAdapterType* {.size: sizeof(cint).} = enum
+  WGPUAdapterType* = enum
     WGPUAdapterType_DiscreteGPU = 0x00000000,
     WGPUAdapterType_IntegratedGPU = 0x00000001,
     WGPUAdapterType_CPU = 0x00000002, WGPUAdapterType_Unknown = 0x00000003,
     WGPUAdapterType_Force32 = 0x7FFFFFFF
-  WGPUAddressMode* {.size: sizeof(cint).} = enum
+  WGPUAddressMode* = enum
     WGPUAddressMode_Repeat = 0x00000000,
     WGPUAddressMode_MirrorRepeat = 0x00000001,
     WGPUAddressMode_ClampToEdge = 0x00000002,
     WGPUAddressMode_Force32 = 0x7FFFFFFF
-  WGPUBackendType* {.size: sizeof(cint).} = enum
+  WGPUBackendType* = enum
     WGPUBackendType_Null = 0x00000000, WGPUBackendType_WebGPU = 0x00000001,
     WGPUBackendType_D3D11 = 0x00000002, WGPUBackendType_D3D12 = 0x00000003,
     WGPUBackendType_Metal = 0x00000004, WGPUBackendType_Vulkan = 0x00000005,
     WGPUBackendType_OpenGL = 0x00000006, WGPUBackendType_OpenGLES = 0x00000007,
     WGPUBackendType_Force32 = 0x7FFFFFFF
-  WGPUBlendFactor* {.size: sizeof(cint).} = enum
+  WGPUBlendFactor* = enum
     WGPUBlendFactor_Zero = 0x00000000, WGPUBlendFactor_One = 0x00000001,
     WGPUBlendFactor_Src = 0x00000002, WGPUBlendFactor_OneMinusSrc = 0x00000003,
     WGPUBlendFactor_SrcAlpha = 0x00000004,
@@ -81,19 +79,19 @@ type
     WGPUBlendFactor_Constant = 0x0000000B,
     WGPUBlendFactor_OneMinusConstant = 0x0000000C,
     WGPUBlendFactor_Force32 = 0x7FFFFFFF
-  WGPUBlendOperation* {.size: sizeof(cint).} = enum
+  WGPUBlendOperation* = enum
     WGPUBlendOperation_Add = 0x00000000,
     WGPUBlendOperation_Subtract = 0x00000001,
     WGPUBlendOperation_ReverseSubtract = 0x00000002,
     WGPUBlendOperation_Min = 0x00000003, WGPUBlendOperation_Max = 0x00000004,
     WGPUBlendOperation_Force32 = 0x7FFFFFFF
-  WGPUBufferBindingType* {.size: sizeof(cint).} = enum
+  WGPUBufferBindingType* = enum
     WGPUBufferBindingType_Undefined = 0x00000000,
     WGPUBufferBindingType_Uniform = 0x00000001,
     WGPUBufferBindingType_Storage = 0x00000002,
     WGPUBufferBindingType_ReadOnlyStorage = 0x00000003,
     WGPUBufferBindingType_Force32 = 0x7FFFFFFF
-  WGPUBufferMapAsyncStatus* {.size: sizeof(cint).} = enum
+  WGPUBufferMapAsyncStatus* = enum
     WGPUBufferMapAsyncStatus_Success = 0x00000000,
     WGPUBufferMapAsyncStatus_Error = 0x00000001,
     WGPUBufferMapAsyncStatus_Unknown = 0x00000002,
@@ -101,12 +99,12 @@ type
     WGPUBufferMapAsyncStatus_DestroyedBeforeCallback = 0x00000004,
     WGPUBufferMapAsyncStatus_UnmappedBeforeCallback = 0x00000005,
     WGPUBufferMapAsyncStatus_Force32 = 0x7FFFFFFF
-  WGPUBufferMapState* {.size: sizeof(cint).} = enum
+  WGPUBufferMapState* = enum
     WGPUBufferMapState_Unmapped = 0x00000000,
     WGPUBufferMapState_Pending = 0x00000001,
     WGPUBufferMapState_Mapped = 0x00000002,
     WGPUBufferMapState_Force32 = 0x7FFFFFFF
-  WGPUCompareFunction* {.size: sizeof(cint).} = enum
+  WGPUCompareFunction* = enum
     WGPUCompareFunction_Undefined = 0x00000000,
     WGPUCompareFunction_Never = 0x00000001,
     WGPUCompareFunction_Less = 0x00000002,
@@ -117,22 +115,22 @@ type
     WGPUCompareFunction_NotEqual = 0x00000007,
     WGPUCompareFunction_Always = 0x00000008,
     WGPUCompareFunction_Force32 = 0x7FFFFFFF
-  WGPUCompilationInfoRequestStatus* {.size: sizeof(cint).} = enum
+  WGPUCompilationInfoRequestStatus* = enum
     WGPUCompilationInfoRequestStatus_Success = 0x00000000,
     WGPUCompilationInfoRequestStatus_Error = 0x00000001,
     WGPUCompilationInfoRequestStatus_DeviceLost = 0x00000002,
     WGPUCompilationInfoRequestStatus_Unknown = 0x00000003,
     WGPUCompilationInfoRequestStatus_Force32 = 0x7FFFFFFF
-  WGPUCompilationMessageType* {.size: sizeof(cint).} = enum
+  WGPUCompilationMessageType* = enum
     WGPUCompilationMessageType_Error = 0x00000000,
     WGPUCompilationMessageType_Warning = 0x00000001,
     WGPUCompilationMessageType_Info = 0x00000002,
     WGPUCompilationMessageType_Force32 = 0x7FFFFFFF
-  WGPUComputePassTimestampLocation* {.size: sizeof(cint).} = enum
+  WGPUComputePassTimestampLocation* = enum
     WGPUComputePassTimestampLocation_Beginning = 0x00000000,
     WGPUComputePassTimestampLocation_End = 0x00000001,
     WGPUComputePassTimestampLocation_Force32 = 0x7FFFFFFF
-  WGPUCreatePipelineAsyncStatus* {.size: sizeof(cint).} = enum
+  WGPUCreatePipelineAsyncStatus* = enum
     WGPUCreatePipelineAsyncStatus_Success = 0x00000000,
     WGPUCreatePipelineAsyncStatus_ValidationError = 0x00000001,
     WGPUCreatePipelineAsyncStatus_InternalError = 0x00000002,
@@ -140,23 +138,23 @@ type
     WGPUCreatePipelineAsyncStatus_DeviceDestroyed = 0x00000004,
     WGPUCreatePipelineAsyncStatus_Unknown = 0x00000005,
     WGPUCreatePipelineAsyncStatus_Force32 = 0x7FFFFFFF
-  WGPUCullMode* {.size: sizeof(cint).} = enum
+  WGPUCullMode* = enum
     WGPUCullMode_None = 0x00000000, WGPUCullMode_Front = 0x00000001,
     WGPUCullMode_Back = 0x00000002, WGPUCullMode_Force32 = 0x7FFFFFFF
-  WGPUDeviceLostReason* {.size: sizeof(cint).} = enum
+  WGPUDeviceLostReason* = enum
     WGPUDeviceLostReason_Undefined = 0x00000000,
     WGPUDeviceLostReason_Destroyed = 0x00000001,
     WGPUDeviceLostReason_Force32 = 0x7FFFFFFF
-  WGPUErrorFilter* {.size: sizeof(cint).} = enum
+  WGPUErrorFilter* = enum
     WGPUErrorFilter_Validation = 0x00000000,
     WGPUErrorFilter_OutOfMemory = 0x00000001,
     WGPUErrorFilter_Internal = 0x00000002, WGPUErrorFilter_Force32 = 0x7FFFFFFF
-  WGPUErrorType* {.size: sizeof(cint).} = enum
+  WGPUErrorType* = enum
     WGPUErrorType_NoError = 0x00000000, WGPUErrorType_Validation = 0x00000001,
     WGPUErrorType_OutOfMemory = 0x00000002, WGPUErrorType_Internal = 0x00000003,
     WGPUErrorType_Unknown = 0x00000004, WGPUErrorType_DeviceLost = 0x00000005,
     WGPUErrorType_Force32 = 0x7FFFFFFF
-  WGPUFeatureName* {.size: sizeof(cint).} = enum
+  WGPUFeatureName* = enum
     WGPUFeatureName_Undefined = 0x00000000,
     WGPUFeatureName_DepthClipControl = 0x00000001,
     WGPUFeatureName_Depth32FloatStencil8 = 0x00000002,
@@ -170,71 +168,71 @@ type
     WGPUFeatureName_RG11B10UfloatRenderable = 0x0000000A,
     WGPUFeatureName_BGRA8UnormStorage = 0x0000000B,
     WGPUFeatureName_Force32 = 0x7FFFFFFF
-  WGPUFilterMode* {.size: sizeof(cint).} = enum
+  WGPUFilterMode* = enum
     WGPUFilterMode_Nearest = 0x00000000, WGPUFilterMode_Linear = 0x00000001,
     WGPUFilterMode_Force32 = 0x7FFFFFFF
-  WGPUFrontFace* {.size: sizeof(cint).} = enum
+  WGPUFrontFace* = enum
     WGPUFrontFace_CCW = 0x00000000, WGPUFrontFace_CW = 0x00000001,
     WGPUFrontFace_Force32 = 0x7FFFFFFF
-  WGPUIndexFormat* {.size: sizeof(cint).} = enum
+  WGPUIndexFormat* = enum
     WGPUIndexFormat_Undefined = 0x00000000, WGPUIndexFormat_Uint16 = 0x00000001,
     WGPUIndexFormat_Uint32 = 0x00000002, WGPUIndexFormat_Force32 = 0x7FFFFFFF
-  WGPULoadOp* {.size: sizeof(cint).} = enum
+  WGPULoadOp* = enum
     WGPULoadOp_Undefined = 0x00000000, WGPULoadOp_Clear = 0x00000001,
     WGPULoadOp_Load = 0x00000002, WGPULoadOp_Force32 = 0x7FFFFFFF
-  WGPUMipmapFilterMode* {.size: sizeof(cint).} = enum
+  WGPUMipmapFilterMode* = enum
     WGPUMipmapFilterMode_Nearest = 0x00000000,
     WGPUMipmapFilterMode_Linear = 0x00000001,
     WGPUMipmapFilterMode_Force32 = 0x7FFFFFFF
-  WGPUPipelineStatisticName* {.size: sizeof(cint).} = enum
+  WGPUPipelineStatisticName* = enum
     WGPUPipelineStatisticName_VertexShaderInvocations = 0x00000000,
     WGPUPipelineStatisticName_ClipperInvocations = 0x00000001,
     WGPUPipelineStatisticName_ClipperPrimitivesOut = 0x00000002,
     WGPUPipelineStatisticName_FragmentShaderInvocations = 0x00000003,
     WGPUPipelineStatisticName_ComputeShaderInvocations = 0x00000004,
     WGPUPipelineStatisticName_Force32 = 0x7FFFFFFF
-  WGPUPowerPreference* {.size: sizeof(cint).} = enum
+  WGPUPowerPreference* = enum
     WGPUPowerPreference_Undefined = 0x00000000,
     WGPUPowerPreference_LowPower = 0x00000001,
     WGPUPowerPreference_HighPerformance = 0x00000002,
     WGPUPowerPreference_Force32 = 0x7FFFFFFF
-  WGPUPresentMode* {.size: sizeof(cint).} = enum
+  WGPUPresentMode* = enum
     WGPUPresentMode_Immediate = 0x00000000,
     WGPUPresentMode_Mailbox = 0x00000001, WGPUPresentMode_Fifo = 0x00000002,
     WGPUPresentMode_Force32 = 0x7FFFFFFF
-  WGPUPrimitiveTopology* {.size: sizeof(cint).} = enum
+  WGPUPrimitiveTopology* = enum
     WGPUPrimitiveTopology_PointList = 0x00000000,
     WGPUPrimitiveTopology_LineList = 0x00000001,
     WGPUPrimitiveTopology_LineStrip = 0x00000002,
     WGPUPrimitiveTopology_TriangleList = 0x00000003,
     WGPUPrimitiveTopology_TriangleStrip = 0x00000004,
     WGPUPrimitiveTopology_Force32 = 0x7FFFFFFF
-  WGPUQueryType* {.size: sizeof(cint).} = enum
+  WGPUQueryType* = enum
     WGPUQueryType_Occlusion = 0x00000000,
     WGPUQueryType_PipelineStatistics = 0x00000001,
     WGPUQueryType_Timestamp = 0x00000002, WGPUQueryType_Force32 = 0x7FFFFFFF
-  WGPUQueueWorkDoneStatus* {.size: sizeof(cint).} = enum
+  WGPUQueueWorkDoneStatus* = enum
     WGPUQueueWorkDoneStatus_Success = 0x00000000,
     WGPUQueueWorkDoneStatus_Error = 0x00000001,
     WGPUQueueWorkDoneStatus_Unknown = 0x00000002,
     WGPUQueueWorkDoneStatus_DeviceLost = 0x00000003,
     WGPUQueueWorkDoneStatus_Force32 = 0x7FFFFFFF
-  WGPURenderPassTimestampLocation* {.size: sizeof(cint).} = enum
+  WGPURenderPassTimestampLocation* = enum
     WGPURenderPassTimestampLocation_Beginning = 0x00000000,
     WGPURenderPassTimestampLocation_End = 0x00000001,
     WGPURenderPassTimestampLocation_Force32 = 0x7FFFFFFF
-  WGPURequestAdapterStatus* {.size: sizeof(cint).} = enum
+  WGPURequestAdapterStatus* = enum
     WGPURequestAdapterStatus_Success = 0x00000000,
     WGPURequestAdapterStatus_Unavailable = 0x00000001,
     WGPURequestAdapterStatus_Error = 0x00000002,
     WGPURequestAdapterStatus_Unknown = 0x00000003,
     WGPURequestAdapterStatus_Force32 = 0x7FFFFFFF
-  WGPURequestDeviceStatus* {.size: sizeof(cint).} = enum
+  WGPURequestDeviceStatus* = enum
     WGPURequestDeviceStatus_Success = 0x00000000,
     WGPURequestDeviceStatus_Error = 0x00000001,
     WGPURequestDeviceStatus_Unknown = 0x00000002,
     WGPURequestDeviceStatus_Force32 = 0x7FFFFFFF
-  WGPUSType* {.size: sizeof(cint).} = enum
+  WGPUSType* = enum
     WGPUSType_Invalid = 0x00000000,
     WGPUSType_SurfaceDescriptorFromMetalLayer = 0x00000001,
     WGPUSType_SurfaceDescriptorFromWindowsHWND = 0x00000002,
@@ -248,13 +246,13 @@ type
     WGPUSType_SurfaceDescriptorFromXcbWindow = 0x0000000A,
     WGPUSType_RenderPassDescriptorMaxDrawCount = 0x0000000F,
     WGPUSType_Force32 = 0x7FFFFFFF
-  WGPUSamplerBindingType* {.size: sizeof(cint).} = enum
+  WGPUSamplerBindingType* = enum
     WGPUSamplerBindingType_Undefined = 0x00000000,
     WGPUSamplerBindingType_Filtering = 0x00000001,
     WGPUSamplerBindingType_NonFiltering = 0x00000002,
     WGPUSamplerBindingType_Comparison = 0x00000003,
     WGPUSamplerBindingType_Force32 = 0x7FFFFFFF
-  WGPUStencilOperation* {.size: sizeof(cint).} = enum
+  WGPUStencilOperation* = enum
     WGPUStencilOperation_Keep = 0x00000000,
     WGPUStencilOperation_Zero = 0x00000001,
     WGPUStencilOperation_Replace = 0x00000002,
@@ -264,29 +262,29 @@ type
     WGPUStencilOperation_IncrementWrap = 0x00000006,
     WGPUStencilOperation_DecrementWrap = 0x00000007,
     WGPUStencilOperation_Force32 = 0x7FFFFFFF
-  WGPUStorageTextureAccess* {.size: sizeof(cint).} = enum
+  WGPUStorageTextureAccess* = enum
     WGPUStorageTextureAccess_Undefined = 0x00000000,
     WGPUStorageTextureAccess_WriteOnly = 0x00000001,
     WGPUStorageTextureAccess_Force32 = 0x7FFFFFFF
-  WGPUStoreOp* {.size: sizeof(cint).} = enum
+  WGPUStoreOp* = enum
     WGPUStoreOp_Undefined = 0x00000000, WGPUStoreOp_Store = 0x00000001,
     WGPUStoreOp_Discard = 0x00000002, WGPUStoreOp_Force32 = 0x7FFFFFFF
-  WGPUTextureAspect* {.size: sizeof(cint).} = enum
+  WGPUTextureAspect* = enum
     WGPUTextureAspect_All = 0x00000000,
     WGPUTextureAspect_StencilOnly = 0x00000001,
     WGPUTextureAspect_DepthOnly = 0x00000002,
     WGPUTextureAspect_Force32 = 0x7FFFFFFF
-  WGPUTextureComponentType* {.size: sizeof(cint).} = enum
+  WGPUTextureComponentType* = enum
     WGPUTextureComponentType_Float = 0x00000000,
     WGPUTextureComponentType_Sint = 0x00000001,
     WGPUTextureComponentType_Uint = 0x00000002,
     WGPUTextureComponentType_DepthComparison = 0x00000003,
     WGPUTextureComponentType_Force32 = 0x7FFFFFFF
-  WGPUTextureDimension* {.size: sizeof(cint).} = enum
+  WGPUTextureDimension* = enum
     WGPUTextureDimension_1D = 0x00000000, WGPUTextureDimension_2D = 0x00000001,
     WGPUTextureDimension_3D = 0x00000002,
     WGPUTextureDimension_Force32 = 0x7FFFFFFF
-  WGPUTextureFormat* {.size: sizeof(cint).} = enum
+  WGPUTextureFormat* = enum
     WGPUTextureFormat_Undefined = 0x00000000,
     WGPUTextureFormat_R8Unorm = 0x00000001,
     WGPUTextureFormat_R8Snorm = 0x00000002,
@@ -383,7 +381,7 @@ type
     WGPUTextureFormat_ASTC12x12Unorm = 0x0000005D,
     WGPUTextureFormat_ASTC12x12UnormSrgb = 0x0000005E,
     WGPUTextureFormat_Force32 = 0x7FFFFFFF
-  WGPUTextureSampleType* {.size: sizeof(cint).} = enum
+  WGPUTextureSampleType* = enum
     WGPUTextureSampleType_Undefined = 0x00000000,
     WGPUTextureSampleType_Float = 0x00000001,
     WGPUTextureSampleType_UnfilterableFloat = 0x00000002,
@@ -391,7 +389,7 @@ type
     WGPUTextureSampleType_Sint = 0x00000004,
     WGPUTextureSampleType_Uint = 0x00000005,
     WGPUTextureSampleType_Force32 = 0x7FFFFFFF
-  WGPUTextureViewDimension* {.size: sizeof(cint).} = enum
+  WGPUTextureViewDimension* = enum
     WGPUTextureViewDimension_Undefined = 0x00000000,
     WGPUTextureViewDimension_1D = 0x00000001,
     WGPUTextureViewDimension_2D = 0x00000002,
@@ -400,7 +398,7 @@ type
     WGPUTextureViewDimension_CubeArray = 0x00000005,
     WGPUTextureViewDimension_3D = 0x00000006,
     WGPUTextureViewDimension_Force32 = 0x7FFFFFFF
-  WGPUVertexFormat* {.size: sizeof(cint).} = enum
+  WGPUVertexFormat* = enum
     WGPUVertexFormat_Undefined = 0x00000000,
     WGPUVertexFormat_Uint8x2 = 0x00000001,
     WGPUVertexFormat_Uint8x4 = 0x00000002,
@@ -433,12 +431,12 @@ type
     WGPUVertexFormat_Sint32x3 = 0x0000001D,
     WGPUVertexFormat_Sint32x4 = 0x0000001E,
     WGPUVertexFormat_Force32 = 0x7FFFFFFF
-  WGPUVertexStepMode* {.size: sizeof(cint).} = enum
+  WGPUVertexStepMode* = enum
     WGPUVertexStepMode_Vertex = 0x00000000,
     WGPUVertexStepMode_Instance = 0x00000001,
     WGPUVertexStepMode_VertexBufferNotUsed = 0x00000002,
     WGPUVertexStepMode_Force32 = 0x7FFFFFFF
-  WGPUBufferUsage* {.size: sizeof(cint).} = enum
+  WGPUBufferUsage* = enum
     WGPUBufferUsage_None = 0x00000000, WGPUBufferUsage_MapRead = 0x00000001,
     WGPUBufferUsage_MapWrite = 0x00000002, WGPUBufferUsage_CopySrc = 0x00000004,
     WGPUBufferUsage_CopyDst = 0x00000008, WGPUBufferUsage_Index = 0x00000010,
@@ -447,22 +445,22 @@ type
     WGPUBufferUsage_QueryResolve = 0x00000200,
     WGPUBufferUsage_Force32 = 0x7FFFFFFF
   WGPUBufferUsageFlags* = WGPUFlags
-  WGPUColorWriteMask* {.size: sizeof(cint).} = enum
+  WGPUColorWriteMask* = enum
     WGPUColorWriteMask_None = 0x00000000, WGPUColorWriteMask_Red = 0x00000001,
     WGPUColorWriteMask_Green = 0x00000002, WGPUColorWriteMask_Blue = 0x00000004,
     WGPUColorWriteMask_Alpha = 0x00000008, WGPUColorWriteMask_All = 0x0000000F,
     WGPUColorWriteMask_Force32 = 0x7FFFFFFF
   WGPUColorWriteMaskFlags* = WGPUFlags
-  WGPUMapMode* {.size: sizeof(cint).} = enum
+  WGPUMapMode* = enum
     WGPUMapMode_None = 0x00000000, WGPUMapMode_Read = 0x00000001,
     WGPUMapMode_Write = 0x00000002, WGPUMapMode_Force32 = 0x7FFFFFFF
   WGPUMapModeFlags* = WGPUFlags
-  WGPUShaderStage* {.size: sizeof(cint).} = enum
+  WGPUShaderStage* = enum
     WGPUShaderStage_None = 0x00000000, WGPUShaderStage_Vertex = 0x00000001,
     WGPUShaderStage_Fragment = 0x00000002, WGPUShaderStage_Compute = 0x00000004,
     WGPUShaderStage_Force32 = 0x7FFFFFFF
   WGPUShaderStageFlags* = WGPUFlags
-  WGPUTextureUsage* {.size: sizeof(cint).} = enum
+  WGPUTextureUsage* = enum
     WGPUTextureUsage_None = 0x00000000, WGPUTextureUsage_CopySrc = 0x00000001,
     WGPUTextureUsage_CopyDst = 0x00000002,
     WGPUTextureUsage_TextureBinding = 0x00000004,
@@ -470,184 +468,153 @@ type
     WGPUTextureUsage_RenderAttachment = 0x00000010,
     WGPUTextureUsage_Force32 = 0x7FFFFFFF
   WGPUTextureUsageFlags* = WGPUFlags
-  WGPUChainedStruct* {.importc: "WGPUChainedStruct",
-                       header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    next* {.importc: "next".}: ptr WGPUChainedStruct
-    sType* {.importc: "sType".}: WGPUSType
+  WGPUChainedStruct* {.bycopy.} = object
+    next*: ptr WGPUChainedStruct
+    sType*: WGPUSType
 
-  WGPUChainedStructOut* {.importc: "WGPUChainedStructOut",
-                          header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                          bycopy.} = object
-    next* {.importc: "next".}: ptr WGPUChainedStructOut
-    sType* {.importc: "sType".}: WGPUSType
+  WGPUChainedStructOut* {.bycopy.} = object
+    next*: ptr WGPUChainedStructOut
+    sType*: WGPUSType
 
-  WGPUAdapterProperties* {.importc: "WGPUAdapterProperties",
-                           header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                           bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStructOut
-    vendorID* {.importc: "vendorID".}: uint32
-    vendorName* {.importc: "vendorName".}: cstring
-    architecture* {.importc: "architecture".}: cstring
-    deviceID* {.importc: "deviceID".}: uint32
-    name* {.importc: "name".}: cstring
-    driverDescription* {.importc: "driverDescription".}: cstring
-    adapterType* {.importc: "adapterType".}: WGPUAdapterType
-    backendType* {.importc: "backendType".}: WGPUBackendType
+  WGPUAdapterProperties* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStructOut
+    vendorID*: uint32
+    vendorName*: cstring
+    architecture*: cstring
+    deviceID*: uint32
+    name*: cstring
+    driverDescription*: cstring
+    adapterType*: WGPUAdapterType
+    backendType*: WGPUBackendType
 
-  WGPUBindGroupEntry* {.importc: "WGPUBindGroupEntry",
-                        header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                        bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    binding* {.importc: "binding".}: uint32
-    buffer* {.importc: "buffer".}: WGPUBuffer
+  WGPUBindGroupEntry* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    binding*: uint32
+    buffer*: WGPUBuffer
     ##  nullable
-    offset* {.importc: "offset".}: uint64
-    size* {.importc: "size".}: uint64
-    sampler* {.importc: "sampler".}: WGPUSampler
+    offset*: uint64
+    size*: uint64
+    sampler*: WGPUSampler
     ##  nullable
-    textureView* {.importc: "textureView".}: WGPUTextureView
+    textureView*: WGPUTextureView
     ##  nullable
 
-  WGPUBlendComponent* {.importc: "WGPUBlendComponent",
-                        header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                        bycopy.} = object
-    operation* {.importc: "operation".}: WGPUBlendOperation
-    srcFactor* {.importc: "srcFactor".}: WGPUBlendFactor
-    dstFactor* {.importc: "dstFactor".}: WGPUBlendFactor
+  WGPUBlendComponent* {.bycopy.} = object
+    operation*: WGPUBlendOperation
+    srcFactor*: WGPUBlendFactor
+    dstFactor*: WGPUBlendFactor
 
-  WGPUBufferBindingLayout* {.importc: "WGPUBufferBindingLayout",
-                             header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                             bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    `type`* {.importc: "type".}: WGPUBufferBindingType
-    hasDynamicOffset* {.importc: "hasDynamicOffset".}: bool
-    minBindingSize* {.importc: "minBindingSize".}: uint64
+  WGPUBufferBindingLayout* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    `type`*: WGPUBufferBindingType
+    hasDynamicOffset*: bool
+    minBindingSize*: uint64
 
-  WGPUBufferDescriptor* {.importc: "WGPUBufferDescriptor",
-                          header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                          bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUBufferDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    usage* {.importc: "usage".}: WGPUBufferUsageFlags
-    size* {.importc: "size".}: uint64
-    mappedAtCreation* {.importc: "mappedAtCreation".}: bool
+    usage*: WGPUBufferUsageFlags
+    size*: uint64
+    mappedAtCreation*: bool
 
-  WGPUColor* {.importc: "WGPUColor",
-               header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    r* {.importc: "r".}: cdouble
-    g* {.importc: "g".}: cdouble
-    b* {.importc: "b".}: cdouble
-    a* {.importc: "a".}: cdouble
+  WGPUColor* {.bycopy.} = object
+    r*: cdouble
+    g*: cdouble
+    b*: cdouble
+    a*: cdouble
 
-  WGPUCommandBufferDescriptor* {.importc: "WGPUCommandBufferDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                 bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUCommandBufferDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
 
-  WGPUCommandEncoderDescriptor* {.importc: "WGPUCommandEncoderDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                  bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUCommandEncoderDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
 
-  WGPUCompilationMessage* {.importc: "WGPUCompilationMessage",
-                            header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                            bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    message* {.importc: "message".}: cstring
+  WGPUCompilationMessage* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    message*: cstring
     ##  nullable
-    `type`* {.importc: "type".}: WGPUCompilationMessageType
-    lineNum* {.importc: "lineNum".}: uint64
-    linePos* {.importc: "linePos".}: uint64
-    offset* {.importc: "offset".}: uint64
-    length* {.importc: "length".}: uint64
-    utf16LinePos* {.importc: "utf16LinePos".}: uint64
-    utf16Offset* {.importc: "utf16Offset".}: uint64
-    utf16Length* {.importc: "utf16Length".}: uint64
+    `type`*: WGPUCompilationMessageType
+    lineNum*: uint64
+    linePos*: uint64
+    offset*: uint64
+    length*: uint64
+    utf16LinePos*: uint64
+    utf16Offset*: uint64
+    utf16Length*: uint64
 
-  WGPUComputePassTimestampWrite* {.importc: "WGPUComputePassTimestampWrite", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                   bycopy.} = object
-    querySet* {.importc: "querySet".}: WGPUQuerySet
-    queryIndex* {.importc: "queryIndex".}: uint32
-    location* {.importc: "location".}: WGPUComputePassTimestampLocation
+  WGPUComputePassTimestampWrite* {.bycopy.} = object
+    querySet*: WGPUQuerySet
+    queryIndex*: uint32
+    location*: WGPUComputePassTimestampLocation
 
-  WGPUConstantEntry* {.importc: "WGPUConstantEntry",
-                       header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    key* {.importc: "key".}: cstring
-    value* {.importc: "value".}: cdouble
+  WGPUConstantEntry* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    key*: cstring
+    value*: cdouble
 
-  WGPUExtent3D* {.importc: "WGPUExtent3D",
-                  header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    width* {.importc: "width".}: uint32
-    height* {.importc: "height".}: uint32
-    depthOrArrayLayers* {.importc: "depthOrArrayLayers".}: uint32
+  WGPUExtent3D* {.bycopy.} = object
+    width*: uint32
+    height*: uint32
+    depthOrArrayLayers*: uint32
 
-  WGPUInstanceDescriptor* {.importc: "WGPUInstanceDescriptor",
-                            header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                            bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
+  WGPUInstanceDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
 
-  WGPULimits* {.importc: "WGPULimits",
-                header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    maxTextureDimension1D* {.importc: "maxTextureDimension1D".}: uint32
-    maxTextureDimension2D* {.importc: "maxTextureDimension2D".}: uint32
-    maxTextureDimension3D* {.importc: "maxTextureDimension3D".}: uint32
-    maxTextureArrayLayers* {.importc: "maxTextureArrayLayers".}: uint32
-    maxBindGroups* {.importc: "maxBindGroups".}: uint32
-    maxBindingsPerBindGroup* {.importc: "maxBindingsPerBindGroup".}: uint32
-    maxDynamicUniformBuffersPerPipelineLayout*
-        {.importc: "maxDynamicUniformBuffersPerPipelineLayout".}: uint32
-    maxDynamicStorageBuffersPerPipelineLayout*
-        {.importc: "maxDynamicStorageBuffersPerPipelineLayout".}: uint32
-    maxSampledTexturesPerShaderStage* {.importc: "maxSampledTexturesPerShaderStage".}: uint32
-    maxSamplersPerShaderStage* {.importc: "maxSamplersPerShaderStage".}: uint32
-    maxStorageBuffersPerShaderStage* {.importc: "maxStorageBuffersPerShaderStage".}: uint32
-    maxStorageTexturesPerShaderStage* {.importc: "maxStorageTexturesPerShaderStage".}: uint32
-    maxUniformBuffersPerShaderStage* {.importc: "maxUniformBuffersPerShaderStage".}: uint32
-    maxUniformBufferBindingSize* {.importc: "maxUniformBufferBindingSize".}: uint64
-    maxStorageBufferBindingSize* {.importc: "maxStorageBufferBindingSize".}: uint64
-    minUniformBufferOffsetAlignment* {.importc: "minUniformBufferOffsetAlignment".}: uint32
-    minStorageBufferOffsetAlignment* {.importc: "minStorageBufferOffsetAlignment".}: uint32
-    maxVertexBuffers* {.importc: "maxVertexBuffers".}: uint32
-    maxBufferSize* {.importc: "maxBufferSize".}: uint64
-    maxVertexAttributes* {.importc: "maxVertexAttributes".}: uint32
-    maxVertexBufferArrayStride* {.importc: "maxVertexBufferArrayStride".}: uint32
-    maxInterStageShaderComponents* {.importc: "maxInterStageShaderComponents".}: uint32
-    maxInterStageShaderVariables* {.importc: "maxInterStageShaderVariables".}: uint32
-    maxColorAttachments* {.importc: "maxColorAttachments".}: uint32
-    maxColorAttachmentBytesPerSample* {.importc: "maxColorAttachmentBytesPerSample".}: uint32
-    maxComputeWorkgroupStorageSize* {.importc: "maxComputeWorkgroupStorageSize".}: uint32
-    maxComputeInvocationsPerWorkgroup* {.
-        importc: "maxComputeInvocationsPerWorkgroup".}: uint32
-    maxComputeWorkgroupSizeX* {.importc: "maxComputeWorkgroupSizeX".}: uint32
-    maxComputeWorkgroupSizeY* {.importc: "maxComputeWorkgroupSizeY".}: uint32
-    maxComputeWorkgroupSizeZ* {.importc: "maxComputeWorkgroupSizeZ".}: uint32
-    maxComputeWorkgroupsPerDimension* {.importc: "maxComputeWorkgroupsPerDimension".}: uint32
+  WGPULimits* {.bycopy.} = object
+    maxTextureDimension1D*: uint32
+    maxTextureDimension2D*: uint32
+    maxTextureDimension3D*: uint32
+    maxTextureArrayLayers*: uint32
+    maxBindGroups*: uint32
+    maxBindingsPerBindGroup*: uint32
+    maxDynamicUniformBuffersPerPipelineLayout*: uint32
+    maxDynamicStorageBuffersPerPipelineLayout*: uint32
+    maxSampledTexturesPerShaderStage*: uint32
+    maxSamplersPerShaderStage*: uint32
+    maxStorageBuffersPerShaderStage*: uint32
+    maxStorageTexturesPerShaderStage*: uint32
+    maxUniformBuffersPerShaderStage*: uint32
+    maxUniformBufferBindingSize*: uint64
+    maxStorageBufferBindingSize*: uint64
+    minUniformBufferOffsetAlignment*: uint32
+    minStorageBufferOffsetAlignment*: uint32
+    maxVertexBuffers*: uint32
+    maxBufferSize*: uint64
+    maxVertexAttributes*: uint32
+    maxVertexBufferArrayStride*: uint32
+    maxInterStageShaderComponents*: uint32
+    maxInterStageShaderVariables*: uint32
+    maxColorAttachments*: uint32
+    maxColorAttachmentBytesPerSample*: uint32
+    maxComputeWorkgroupStorageSize*: uint32
+    maxComputeInvocationsPerWorkgroup*: uint32
+    maxComputeWorkgroupSizeX*: uint32
+    maxComputeWorkgroupSizeY*: uint32
+    maxComputeWorkgroupSizeZ*: uint32
+    maxComputeWorkgroupsPerDimension*: uint32
 
-  WGPUMultisampleState* {.importc: "WGPUMultisampleState",
-                          header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                          bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    count* {.importc: "count".}: uint32
-    mask* {.importc: "mask".}: uint32
-    alphaToCoverageEnabled* {.importc: "alphaToCoverageEnabled".}: bool
+  WGPUMultisampleState* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    count*: uint32
+    mask*: uint32
+    alphaToCoverageEnabled*: bool
 
-  WGPUOrigin3D* {.importc: "WGPUOrigin3D",
-                  header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    x* {.importc: "x".}: uint32
-    y* {.importc: "y".}: uint32
-    z* {.importc: "z".}: uint32
+  WGPUOrigin3D* {.bycopy.} = object
+    x*: uint32
+    y*: uint32
+    z*: uint32
 
-  WGPUPipelineLayoutDescriptor* {.importc: "WGPUPipelineLayoutDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                  bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUPipelineLayoutDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    bindGroupLayoutCount* {.importc: "bindGroupLayoutCount".}: uint32
-    bindGroupLayouts* {.importc: "bindGroupLayouts".}: ptr WGPUBindGroupLayout
+    bindGroupLayoutCount*: uint32
+    bindGroupLayouts*: ptr WGPUBindGroupLayout
 
 
 
@@ -703,499 +670,418 @@ type
 ##  Can be chained in WGPUPrimitiveState
 
 type
-  WGPUPrimitiveDepthClipControl* {.importc: "WGPUPrimitiveDepthClipControl", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                   bycopy.} = object
-    chain* {.importc: "chain".}: WGPUChainedStruct
-    unclippedDepth* {.importc: "unclippedDepth".}: bool
+  WGPUPrimitiveDepthClipControl* {.bycopy.} = object
+    chain*: WGPUChainedStruct
+    unclippedDepth*: bool
 
-  WGPUPrimitiveState* {.importc: "WGPUPrimitiveState",
-                        header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                        bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    topology* {.importc: "topology".}: WGPUPrimitiveTopology
-    stripIndexFormat* {.importc: "stripIndexFormat".}: WGPUIndexFormat
-    frontFace* {.importc: "frontFace".}: WGPUFrontFace
-    cullMode* {.importc: "cullMode".}: WGPUCullMode
+  WGPUPrimitiveState* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    topology*: WGPUPrimitiveTopology
+    stripIndexFormat*: WGPUIndexFormat
+    frontFace*: WGPUFrontFace
+    cullMode*: WGPUCullMode
 
-  WGPUQuerySetDescriptor* {.importc: "WGPUQuerySetDescriptor",
-                            header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                            bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUQuerySetDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    `type`* {.importc: "type".}: WGPUQueryType
-    count* {.importc: "count".}: uint32
-    pipelineStatistics* {.importc: "pipelineStatistics".}: ptr WGPUPipelineStatisticName
-    pipelineStatisticsCount* {.importc: "pipelineStatisticsCount".}: uint32
+    `type`*: WGPUQueryType
+    count*: uint32
+    pipelineStatistics*: ptr WGPUPipelineStatisticName
+    pipelineStatisticsCount*: uint32
 
-  WGPUQueueDescriptor* {.importc: "WGPUQueueDescriptor",
-                         header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                         bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUQueueDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
 
-  WGPURenderBundleDescriptor* {.importc: "WGPURenderBundleDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPURenderBundleDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
 
-  WGPURenderBundleEncoderDescriptor* {.importc: "WGPURenderBundleEncoderDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                       bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPURenderBundleEncoderDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    colorFormatsCount* {.importc: "colorFormatsCount".}: uint32
-    colorFormats* {.importc: "colorFormats".}: ptr WGPUTextureFormat
-    depthStencilFormat* {.importc: "depthStencilFormat".}: WGPUTextureFormat
-    sampleCount* {.importc: "sampleCount".}: uint32
-    depthReadOnly* {.importc: "depthReadOnly".}: bool
-    stencilReadOnly* {.importc: "stencilReadOnly".}: bool
+    colorFormatsCount*: uint32
+    colorFormats*: ptr WGPUTextureFormat
+    depthStencilFormat*: WGPUTextureFormat
+    sampleCount*: uint32
+    depthReadOnly*: bool
+    stencilReadOnly*: bool
 
-  WGPURenderPassDepthStencilAttachment* {.
-      importc: "WGPURenderPassDepthStencilAttachment",
-      header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    view* {.importc: "view".}: WGPUTextureView
-    depthLoadOp* {.importc: "depthLoadOp".}: WGPULoadOp
-    depthStoreOp* {.importc: "depthStoreOp".}: WGPUStoreOp
-    depthClearValue* {.importc: "depthClearValue".}: cfloat
-    depthReadOnly* {.importc: "depthReadOnly".}: bool
-    stencilLoadOp* {.importc: "stencilLoadOp".}: WGPULoadOp
-    stencilStoreOp* {.importc: "stencilStoreOp".}: WGPUStoreOp
-    stencilClearValue* {.importc: "stencilClearValue".}: uint32
-    stencilReadOnly* {.importc: "stencilReadOnly".}: bool
+  WGPURenderPassDepthStencilAttachment* {.bycopy.} = object
+    view*: WGPUTextureView
+    depthLoadOp*: WGPULoadOp
+    depthStoreOp*: WGPUStoreOp
+    depthClearValue*: cfloat
+    depthReadOnly*: bool
+    stencilLoadOp*: WGPULoadOp
+    stencilStoreOp*: WGPUStoreOp
+    stencilClearValue*: uint32
+    stencilReadOnly*: bool
 
 
 ##  Can be chained in WGPURenderPassDescriptor
 
 type
-  WGPURenderPassDescriptorMaxDrawCount* {.
-      importc: "WGPURenderPassDescriptorMaxDrawCount",
-      header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    chain* {.importc: "chain".}: WGPUChainedStruct
-    maxDrawCount* {.importc: "maxDrawCount".}: uint64
+  WGPURenderPassDescriptorMaxDrawCount* {.bycopy.} = object
+    chain*: WGPUChainedStruct
+    maxDrawCount*: uint64
 
-  WGPURenderPassTimestampWrite* {.importc: "WGPURenderPassTimestampWrite", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                  bycopy.} = object
-    querySet* {.importc: "querySet".}: WGPUQuerySet
-    queryIndex* {.importc: "queryIndex".}: uint32
-    location* {.importc: "location".}: WGPURenderPassTimestampLocation
+  WGPURenderPassTimestampWrite* {.bycopy.} = object
+    querySet*: WGPUQuerySet
+    queryIndex*: uint32
+    location*: WGPURenderPassTimestampLocation
 
-  WGPURequestAdapterOptions* {.importc: "WGPURequestAdapterOptions", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                               bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    compatibleSurface* {.importc: "compatibleSurface".}: WGPUSurface
+  WGPURequestAdapterOptions* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    compatibleSurface*: WGPUSurface
     ##  nullable
-    powerPreference* {.importc: "powerPreference".}: WGPUPowerPreference
-    forceFallbackAdapter* {.importc: "forceFallbackAdapter".}: bool
+    powerPreference*: WGPUPowerPreference
+    forceFallbackAdapter*: bool
 
-  WGPUSamplerBindingLayout* {.importc: "WGPUSamplerBindingLayout", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                              bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    `type`* {.importc: "type".}: WGPUSamplerBindingType
+  WGPUSamplerBindingLayout* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    `type`*: WGPUSamplerBindingType
 
-  WGPUSamplerDescriptor* {.importc: "WGPUSamplerDescriptor",
-                           header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                           bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUSamplerDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    addressModeU* {.importc: "addressModeU".}: WGPUAddressMode
-    addressModeV* {.importc: "addressModeV".}: WGPUAddressMode
-    addressModeW* {.importc: "addressModeW".}: WGPUAddressMode
-    magFilter* {.importc: "magFilter".}: WGPUFilterMode
-    minFilter* {.importc: "minFilter".}: WGPUFilterMode
-    mipmapFilter* {.importc: "mipmapFilter".}: WGPUMipmapFilterMode
-    lodMinClamp* {.importc: "lodMinClamp".}: cfloat
-    lodMaxClamp* {.importc: "lodMaxClamp".}: cfloat
-    compare* {.importc: "compare".}: WGPUCompareFunction
-    maxAnisotropy* {.importc: "maxAnisotropy".}: uint16
+    addressModeU*: WGPUAddressMode
+    addressModeV*: WGPUAddressMode
+    addressModeW*: WGPUAddressMode
+    magFilter*: WGPUFilterMode
+    minFilter*: WGPUFilterMode
+    mipmapFilter*: WGPUMipmapFilterMode
+    lodMinClamp*: cfloat
+    lodMaxClamp*: cfloat
+    compare*: WGPUCompareFunction
+    maxAnisotropy*: uint16
 
-  WGPUShaderModuleCompilationHint* {.importc: "WGPUShaderModuleCompilationHint", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                     bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    entryPoint* {.importc: "entryPoint".}: cstring
-    layout* {.importc: "layout".}: WGPUPipelineLayout
+  WGPUShaderModuleCompilationHint* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    entryPoint*: cstring
+    layout*: WGPUPipelineLayout
 
 
 ##  Can be chained in WGPUShaderModuleDescriptor
 
 type
-  WGPUShaderModuleSPIRVDescriptor* {.importc: "WGPUShaderModuleSPIRVDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                     bycopy.} = object
-    chain* {.importc: "chain".}: WGPUChainedStruct
-    codeSize* {.importc: "codeSize".}: uint32
-    code* {.importc: "code".}: ptr uint32
+  WGPUShaderModuleSPIRVDescriptor* {.bycopy.} = object
+    chain*: WGPUChainedStruct
+    codeSize*: uint32
+    code*: ptr uint32
 
 
 ##  Can be chained in WGPUShaderModuleDescriptor
 
 type
-  WGPUShaderModuleWGSLDescriptor* {.importc: "WGPUShaderModuleWGSLDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                    bycopy.} = object
-    chain* {.importc: "chain".}: WGPUChainedStruct
-    code* {.importc: "code".}: cstring
+  WGPUShaderModuleWGSLDescriptor* {.bycopy.} = object
+    chain*: WGPUChainedStruct
+    code*: cstring
 
-  WGPUStencilFaceState* {.importc: "WGPUStencilFaceState",
-                          header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                          bycopy.} = object
-    compare* {.importc: "compare".}: WGPUCompareFunction
-    failOp* {.importc: "failOp".}: WGPUStencilOperation
-    depthFailOp* {.importc: "depthFailOp".}: WGPUStencilOperation
-    passOp* {.importc: "passOp".}: WGPUStencilOperation
+  WGPUStencilFaceState* {.bycopy.} = object
+    compare*: WGPUCompareFunction
+    failOp*: WGPUStencilOperation
+    depthFailOp*: WGPUStencilOperation
+    passOp*: WGPUStencilOperation
 
-  WGPUStorageTextureBindingLayout* {.importc: "WGPUStorageTextureBindingLayout", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                     bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    access* {.importc: "access".}: WGPUStorageTextureAccess
-    format* {.importc: "format".}: WGPUTextureFormat
-    viewDimension* {.importc: "viewDimension".}: WGPUTextureViewDimension
+  WGPUStorageTextureBindingLayout* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    access*: WGPUStorageTextureAccess
+    format*: WGPUTextureFormat
+    viewDimension*: WGPUTextureViewDimension
 
-  WGPUSurfaceDescriptor* {.importc: "WGPUSurfaceDescriptor",
-                           header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                           bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUSurfaceDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
 
 
 ##  Can be chained in WGPUSurfaceDescriptor
 
 type
-  WGPUSurfaceDescriptorFromAndroidNativeWindow* {.
-      importc: "WGPUSurfaceDescriptorFromAndroidNativeWindow",
-      header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    chain* {.importc: "chain".}: WGPUChainedStruct
-    window* {.importc: "window".}: pointer
+  WGPUSurfaceDescriptorFromAndroidNativeWindow* {.bycopy.} = object
+    chain*: WGPUChainedStruct
+    window*: pointer
 
 
 ##  Can be chained in WGPUSurfaceDescriptor
 
 type
-  WGPUSurfaceDescriptorFromCanvasHTMLSelector* {.
-      importc: "WGPUSurfaceDescriptorFromCanvasHTMLSelector",
-      header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    chain* {.importc: "chain".}: WGPUChainedStruct
-    selector* {.importc: "selector".}: cstring
+  WGPUSurfaceDescriptorFromCanvasHTMLSelector* {.bycopy.} = object
+    chain*: WGPUChainedStruct
+    selector*: cstring
 
 
 ##  Can be chained in WGPUSurfaceDescriptor
 
 type
-  WGPUSurfaceDescriptorFromMetalLayer* {.
-      importc: "WGPUSurfaceDescriptorFromMetalLayer",
-      header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    chain* {.importc: "chain".}: WGPUChainedStruct
-    layer* {.importc: "layer".}: pointer
+  WGPUSurfaceDescriptorFromMetalLayer* {.bycopy.} = object
+    chain*: WGPUChainedStruct
+    layer*: pointer
 
 
 ##  Can be chained in WGPUSurfaceDescriptor
 
 type
-  WGPUSurfaceDescriptorFromWaylandSurface* {.
-      importc: "WGPUSurfaceDescriptorFromWaylandSurface",
-      header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    chain* {.importc: "chain".}: WGPUChainedStruct
-    display* {.importc: "display".}: pointer
-    surface* {.importc: "surface".}: pointer
+  WGPUSurfaceDescriptorFromWaylandSurface* {.bycopy.} = object
+    chain*: WGPUChainedStruct
+    display*: pointer
+    surface*: pointer
 
 
 ##  Can be chained in WGPUSurfaceDescriptor
 
 type
-  WGPUSurfaceDescriptorFromWindowsHWND* {.
-      importc: "WGPUSurfaceDescriptorFromWindowsHWND",
-      header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    chain* {.importc: "chain".}: WGPUChainedStruct
-    hinstance* {.importc: "hinstance".}: pointer
-    hwnd* {.importc: "hwnd".}: pointer
+  WGPUSurfaceDescriptorFromWindowsHWND* {.bycopy.} = object
+    chain*: WGPUChainedStruct
+    hinstance*: pointer
+    hwnd*: pointer
 
 
 ##  Can be chained in WGPUSurfaceDescriptor
 
 type
-  WGPUSurfaceDescriptorFromXcbWindow* {.importc: "WGPUSurfaceDescriptorFromXcbWindow", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                        bycopy.} = object
-    chain* {.importc: "chain".}: WGPUChainedStruct
-    connection* {.importc: "connection".}: pointer
-    window* {.importc: "window".}: uint32
+  WGPUSurfaceDescriptorFromXcbWindow* {.bycopy.} = object
+    chain*: WGPUChainedStruct
+    connection*: pointer
+    window*: uint32
 
 
 ##  Can be chained in WGPUSurfaceDescriptor
 
 type
-  WGPUSurfaceDescriptorFromXlibWindow* {.
-      importc: "WGPUSurfaceDescriptorFromXlibWindow",
-      header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    chain* {.importc: "chain".}: WGPUChainedStruct
-    display* {.importc: "display".}: pointer
-    window* {.importc: "window".}: uint32
+  WGPUSurfaceDescriptorFromXlibWindow* {.bycopy.} = object
+    chain*: WGPUChainedStruct
+    display*: pointer
+    window*: uint32
 
-  WGPUSwapChainDescriptor* {.importc: "WGPUSwapChainDescriptor",
-                             header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                             bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUSwapChainDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    usage* {.importc: "usage".}: WGPUTextureUsageFlags
-    format* {.importc: "format".}: WGPUTextureFormat
-    width* {.importc: "width".}: uint32
-    height* {.importc: "height".}: uint32
-    presentMode* {.importc: "presentMode".}: WGPUPresentMode
+    usage*: WGPUTextureUsageFlags
+    format*: WGPUTextureFormat
+    width*: uint32
+    height*: uint32
+    presentMode*: WGPUPresentMode
 
-  WGPUTextureBindingLayout* {.importc: "WGPUTextureBindingLayout", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                              bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    sampleType* {.importc: "sampleType".}: WGPUTextureSampleType
-    viewDimension* {.importc: "viewDimension".}: WGPUTextureViewDimension
-    multisampled* {.importc: "multisampled".}: bool
+  WGPUTextureBindingLayout* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    sampleType*: WGPUTextureSampleType
+    viewDimension*: WGPUTextureViewDimension
+    multisampled*: bool
 
-  WGPUTextureDataLayout* {.importc: "WGPUTextureDataLayout",
-                           header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                           bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    offset* {.importc: "offset".}: uint64
-    bytesPerRow* {.importc: "bytesPerRow".}: uint32
-    rowsPerImage* {.importc: "rowsPerImage".}: uint32
+  WGPUTextureDataLayout* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    offset*: uint64
+    bytesPerRow*: uint32
+    rowsPerImage*: uint32
 
-  WGPUTextureViewDescriptor* {.importc: "WGPUTextureViewDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                               bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUTextureViewDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    format* {.importc: "format".}: WGPUTextureFormat
-    dimension* {.importc: "dimension".}: WGPUTextureViewDimension
-    baseMipLevel* {.importc: "baseMipLevel".}: uint32
-    mipLevelCount* {.importc: "mipLevelCount".}: uint32
-    baseArrayLayer* {.importc: "baseArrayLayer".}: uint32
-    arrayLayerCount* {.importc: "arrayLayerCount".}: uint32
-    aspect* {.importc: "aspect".}: WGPUTextureAspect
+    format*: WGPUTextureFormat
+    dimension*: WGPUTextureViewDimension
+    baseMipLevel*: uint32
+    mipLevelCount*: uint32
+    baseArrayLayer*: uint32
+    arrayLayerCount*: uint32
+    aspect*: WGPUTextureAspect
 
-  WGPUVertexAttribute* {.importc: "WGPUVertexAttribute",
-                         header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                         bycopy.} = object
-    format* {.importc: "format".}: WGPUVertexFormat
-    offset* {.importc: "offset".}: uint64
-    shaderLocation* {.importc: "shaderLocation".}: uint32
+  WGPUVertexAttribute* {.bycopy.} = object
+    format*: WGPUVertexFormat
+    offset*: uint64
+    shaderLocation*: uint32
 
-  WGPUBindGroupDescriptor* {.importc: "WGPUBindGroupDescriptor",
-                             header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                             bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUBindGroupDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    layout* {.importc: "layout".}: WGPUBindGroupLayout
-    entryCount* {.importc: "entryCount".}: uint32
-    entries* {.importc: "entries".}: ptr WGPUBindGroupEntry
+    layout*: WGPUBindGroupLayout
+    entryCount*: uint32
+    entries*: ptr WGPUBindGroupEntry
 
-  WGPUBindGroupLayoutEntry* {.importc: "WGPUBindGroupLayoutEntry", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                              bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    binding* {.importc: "binding".}: uint32
-    visibility* {.importc: "visibility".}: WGPUShaderStageFlags
-    buffer* {.importc: "buffer".}: WGPUBufferBindingLayout
-    sampler* {.importc: "sampler".}: WGPUSamplerBindingLayout
-    texture* {.importc: "texture".}: WGPUTextureBindingLayout
-    storageTexture* {.importc: "storageTexture".}: WGPUStorageTextureBindingLayout
+  WGPUBindGroupLayoutEntry* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    binding*: uint32
+    visibility*: WGPUShaderStageFlags
+    buffer*: WGPUBufferBindingLayout
+    sampler*: WGPUSamplerBindingLayout
+    texture*: WGPUTextureBindingLayout
+    storageTexture*: WGPUStorageTextureBindingLayout
 
-  WGPUBlendState* {.importc: "WGPUBlendState",
-                    header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    color* {.importc: "color".}: WGPUBlendComponent
-    alpha* {.importc: "alpha".}: WGPUBlendComponent
+  WGPUBlendState* {.bycopy.} = object
+    color*: WGPUBlendComponent
+    alpha*: WGPUBlendComponent
 
-  WGPUCompilationInfo* {.importc: "WGPUCompilationInfo",
-                         header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                         bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    messageCount* {.importc: "messageCount".}: uint32
-    messages* {.importc: "messages".}: ptr WGPUCompilationMessage
+  WGPUCompilationInfo* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    messageCount*: uint32
+    messages*: ptr WGPUCompilationMessage
 
-  WGPUComputePassDescriptor* {.importc: "WGPUComputePassDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                               bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUComputePassDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    timestampWriteCount* {.importc: "timestampWriteCount".}: uint32
-    timestampWrites* {.importc: "timestampWrites".}: ptr WGPUComputePassTimestampWrite
+    timestampWriteCount*: uint32
+    timestampWrites*: ptr WGPUComputePassTimestampWrite
 
-  WGPUDepthStencilState* {.importc: "WGPUDepthStencilState",
-                           header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                           bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    format* {.importc: "format".}: WGPUTextureFormat
-    depthWriteEnabled* {.importc: "depthWriteEnabled".}: bool
-    depthCompare* {.importc: "depthCompare".}: WGPUCompareFunction
-    stencilFront* {.importc: "stencilFront".}: WGPUStencilFaceState
-    stencilBack* {.importc: "stencilBack".}: WGPUStencilFaceState
-    stencilReadMask* {.importc: "stencilReadMask".}: uint32
-    stencilWriteMask* {.importc: "stencilWriteMask".}: uint32
-    depthBias* {.importc: "depthBias".}: int32
-    depthBiasSlopeScale* {.importc: "depthBiasSlopeScale".}: cfloat
-    depthBiasClamp* {.importc: "depthBiasClamp".}: cfloat
+  WGPUDepthStencilState* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    format*: WGPUTextureFormat
+    depthWriteEnabled*: bool
+    depthCompare*: WGPUCompareFunction
+    stencilFront*: WGPUStencilFaceState
+    stencilBack*: WGPUStencilFaceState
+    stencilReadMask*: uint32
+    stencilWriteMask*: uint32
+    depthBias*: int32
+    depthBiasSlopeScale*: cfloat
+    depthBiasClamp*: cfloat
 
-  WGPUImageCopyBuffer* {.importc: "WGPUImageCopyBuffer",
-                         header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                         bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    layout* {.importc: "layout".}: WGPUTextureDataLayout
-    buffer* {.importc: "buffer".}: WGPUBuffer
+  WGPUImageCopyBuffer* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    layout*: WGPUTextureDataLayout
+    buffer*: WGPUBuffer
 
-  WGPUImageCopyTexture* {.importc: "WGPUImageCopyTexture",
-                          header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                          bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    texture* {.importc: "texture".}: WGPUTexture
-    mipLevel* {.importc: "mipLevel".}: uint32
-    origin* {.importc: "origin".}: WGPUOrigin3D
-    aspect* {.importc: "aspect".}: WGPUTextureAspect
+  WGPUImageCopyTexture* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    texture*: WGPUTexture
+    mipLevel*: uint32
+    origin*: WGPUOrigin3D
+    aspect*: WGPUTextureAspect
 
-  WGPUProgrammableStageDescriptor* {.importc: "WGPUProgrammableStageDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                     bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    module* {.importc: "module".}: WGPUShaderModule
-    entryPoint* {.importc: "entryPoint".}: cstring
-    constantCount* {.importc: "constantCount".}: uint32
-    constants* {.importc: "constants".}: ptr WGPUConstantEntry
+  WGPUProgrammableStageDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    module*: WGPUShaderModule
+    entryPoint*: cstring
+    constantCount*: uint32
+    constants*: ptr WGPUConstantEntry
 
-  WGPURenderPassColorAttachment* {.importc: "WGPURenderPassColorAttachment", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                   bycopy.} = object
-    view* {.importc: "view".}: WGPUTextureView
+  WGPURenderPassColorAttachment* {.bycopy.} = object
+    view*: WGPUTextureView
     ##  nullable
-    resolveTarget* {.importc: "resolveTarget".}: WGPUTextureView
+    resolveTarget*: WGPUTextureView
     ##  nullable
-    loadOp* {.importc: "loadOp".}: WGPULoadOp
-    storeOp* {.importc: "storeOp".}: WGPUStoreOp
-    clearValue* {.importc: "clearValue".}: WGPUColor
+    loadOp*: WGPULoadOp
+    storeOp*: WGPUStoreOp
+    clearValue*: WGPUColor
 
-  WGPURequiredLimits* {.importc: "WGPURequiredLimits",
-                        header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                        bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    limits* {.importc: "limits".}: WGPULimits
+  WGPURequiredLimits* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    limits*: WGPULimits
 
-  WGPUShaderModuleDescriptor* {.importc: "WGPUShaderModuleDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUShaderModuleDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    hintCount* {.importc: "hintCount".}: uint32
-    hints* {.importc: "hints".}: ptr WGPUShaderModuleCompilationHint
+    hintCount*: uint32
+    hints*: ptr WGPUShaderModuleCompilationHint
 
-  WGPUSupportedLimits* {.importc: "WGPUSupportedLimits",
-                         header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                         bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStructOut
-    limits* {.importc: "limits".}: WGPULimits
+  WGPUSupportedLimits* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStructOut
+    limits*: WGPULimits
 
-  WGPUTextureDescriptor* {.importc: "WGPUTextureDescriptor",
-                           header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                           bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUTextureDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    usage* {.importc: "usage".}: WGPUTextureUsageFlags
-    dimension* {.importc: "dimension".}: WGPUTextureDimension
-    size* {.importc: "size".}: WGPUExtent3D
-    format* {.importc: "format".}: WGPUTextureFormat
-    mipLevelCount* {.importc: "mipLevelCount".}: uint32
-    sampleCount* {.importc: "sampleCount".}: uint32
-    viewFormatCount* {.importc: "viewFormatCount".}: uint32
-    viewFormats* {.importc: "viewFormats".}: ptr WGPUTextureFormat
+    usage*: WGPUTextureUsageFlags
+    dimension*: WGPUTextureDimension
+    size*: WGPUExtent3D
+    format*: WGPUTextureFormat
+    mipLevelCount*: uint32
+    sampleCount*: uint32
+    viewFormatCount*: uint32
+    viewFormats*: ptr WGPUTextureFormat
 
-  WGPUVertexBufferLayout* {.importc: "WGPUVertexBufferLayout",
-                            header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                            bycopy.} = object
-    arrayStride* {.importc: "arrayStride".}: uint64
-    stepMode* {.importc: "stepMode".}: WGPUVertexStepMode
-    attributeCount* {.importc: "attributeCount".}: uint32
-    attributes* {.importc: "attributes".}: ptr WGPUVertexAttribute
+  WGPUVertexBufferLayout* {.bycopy.} = object
+    arrayStride*: uint64
+    stepMode*: WGPUVertexStepMode
+    attributeCount*: uint32
+    attributes*: ptr WGPUVertexAttribute
 
-  WGPUBindGroupLayoutDescriptor* {.importc: "WGPUBindGroupLayoutDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                   bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUBindGroupLayoutDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    entryCount* {.importc: "entryCount".}: uint32
-    entries* {.importc: "entries".}: ptr WGPUBindGroupLayoutEntry
+    entryCount*: uint32
+    entries*: ptr WGPUBindGroupLayoutEntry
 
-  WGPUColorTargetState* {.importc: "WGPUColorTargetState",
-                          header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                          bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    format* {.importc: "format".}: WGPUTextureFormat
-    blend* {.importc: "blend".}: ptr WGPUBlendState
+  WGPUColorTargetState* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    format*: WGPUTextureFormat
+    blend*: ptr WGPUBlendState
     ##  nullable
-    writeMask* {.importc: "writeMask".}: WGPUColorWriteMaskFlags
+    writeMask*: WGPUColorWriteMaskFlags
 
-  WGPUComputePipelineDescriptor* {.importc: "WGPUComputePipelineDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                   bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUComputePipelineDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    layout* {.importc: "layout".}: WGPUPipelineLayout
+    layout*: WGPUPipelineLayout
     ##  nullable
-    compute* {.importc: "compute".}: WGPUProgrammableStageDescriptor
+    compute*: WGPUProgrammableStageDescriptor
 
-  WGPUDeviceDescriptor* {.importc: "WGPUDeviceDescriptor",
-                          header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                          bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPUDeviceDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    requiredFeaturesCount* {.importc: "requiredFeaturesCount".}: uint32
-    requiredFeatures* {.importc: "requiredFeatures".}: ptr WGPUFeatureName
-    requiredLimits* {.importc: "requiredLimits".}: ptr WGPURequiredLimits
+    requiredFeaturesCount*: uint32
+    requiredFeatures*: ptr WGPUFeatureName
+    requiredLimits*: ptr WGPURequiredLimits
     ##  nullable
-    defaultQueue* {.importc: "defaultQueue".}: WGPUQueueDescriptor
+    defaultQueue*: WGPUQueueDescriptor
 
-  WGPURenderPassDescriptor* {.importc: "WGPURenderPassDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                              bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPURenderPassDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    colorAttachmentCount* {.importc: "colorAttachmentCount".}: uint32
-    colorAttachments* {.importc: "colorAttachments".}: ptr WGPURenderPassColorAttachment
-    depthStencilAttachment* {.importc: "depthStencilAttachment".}: ptr WGPURenderPassDepthStencilAttachment
+    colorAttachmentCount*: uint32
+    colorAttachments*: ptr WGPURenderPassColorAttachment
+    depthStencilAttachment*: ptr WGPURenderPassDepthStencilAttachment
     ##  nullable
-    occlusionQuerySet* {.importc: "occlusionQuerySet".}: WGPUQuerySet
+    occlusionQuerySet*: WGPUQuerySet
     ##  nullable
-    timestampWriteCount* {.importc: "timestampWriteCount".}: uint32
-    timestampWrites* {.importc: "timestampWrites".}: ptr WGPURenderPassTimestampWrite
+    timestampWriteCount*: uint32
+    timestampWrites*: ptr WGPURenderPassTimestampWrite
 
-  WGPUVertexState* {.importc: "WGPUVertexState",
-                     header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    module* {.importc: "module".}: WGPUShaderModule
-    entryPoint* {.importc: "entryPoint".}: cstring
-    constantCount* {.importc: "constantCount".}: uint32
-    constants* {.importc: "constants".}: ptr WGPUConstantEntry
-    bufferCount* {.importc: "bufferCount".}: uint32
-    buffers* {.importc: "buffers".}: ptr WGPUVertexBufferLayout
+  WGPUVertexState* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    module*: WGPUShaderModule
+    entryPoint*: cstring
+    constantCount*: uint32
+    constants*: ptr WGPUConstantEntry
+    bufferCount*: uint32
+    buffers*: ptr WGPUVertexBufferLayout
 
-  WGPUFragmentState* {.importc: "WGPUFragmentState",
-                       header: "wgpu-native/ffi/webgpu-headers/webgpu.h", bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    module* {.importc: "module".}: WGPUShaderModule
-    entryPoint* {.importc: "entryPoint".}: cstring
-    constantCount* {.importc: "constantCount".}: uint32
-    constants* {.importc: "constants".}: ptr WGPUConstantEntry
-    targetCount* {.importc: "targetCount".}: uint32
-    targets* {.importc: "targets".}: ptr WGPUColorTargetState
+  WGPUFragmentState* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    module*: WGPUShaderModule
+    entryPoint*: cstring
+    constantCount*: uint32
+    constants*: ptr WGPUConstantEntry
+    targetCount*: uint32
+    targets*: ptr WGPUColorTargetState
 
-  WGPURenderPipelineDescriptor* {.importc: "WGPURenderPipelineDescriptor", header: "wgpu-native/ffi/webgpu-headers/webgpu.h",
-                                  bycopy.} = object
-    nextInChain* {.importc: "nextInChain".}: ptr WGPUChainedStruct
-    label* {.importc: "label".}: cstring
+  WGPURenderPipelineDescriptor* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    label*: cstring
     ##  nullable
-    layout* {.importc: "layout".}: WGPUPipelineLayout
+    layout*: WGPUPipelineLayout
     ##  nullable
-    vertex* {.importc: "vertex".}: WGPUVertexState
-    primitive* {.importc: "primitive".}: WGPUPrimitiveState
-    depthStencil* {.importc: "depthStencil".}: ptr WGPUDepthStencilState
+    vertex*: WGPUVertexState
+    primitive*: WGPUPrimitiveState
+    depthStencil*: ptr WGPUDepthStencilState
     ##  nullable
-    multisample* {.importc: "multisample".}: WGPUMultisampleState
-    fragment* {.importc: "fragment".}: ptr WGPUFragmentState
+    multisample*: WGPUMultisampleState
+    fragment*: ptr WGPUFragmentState
     ##  nullable
 
   WGPUBufferMapCallback* = proc (status: WGPUBufferMapAsyncStatus;
