@@ -1,11 +1,10 @@
 {.experimental: "codeReordering".}
 
-import std/[os, strutils]
-const wgpuLib = currentSourcePath.parentDir/"wgpu-native"/"target"/"release/"
+import std/os
+const wgpuLib = currentSourcePath.parentDir/"wgpu-native/target/release/"
 
 when defined(WGPU_NATIVE_DYNLIB):
   const wgpudll = wgpuLib & "./" & (DynlibFormat % "wgpu_native")
-
   {.pragma: clib, cdecl, dynlib: wgpudll.}
 else:
   {.pragma: clib.}
@@ -22,6 +21,7 @@ type
   WGPUComputePassEncoder* = distinct pointer
   WGPUComputePipeline* = distinct pointer
   WGPUDevice* = distinct pointer
+  WGPUExternalTexture* = distinct pointer
   WGPUInstance* = distinct pointer
   WGPUPipelineLayout* = distinct pointer
   WGPUQuerySet* = distinct pointer

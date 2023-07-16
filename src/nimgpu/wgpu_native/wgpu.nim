@@ -1,11 +1,10 @@
 import webgpu
 
-import std/[os, strutils]
-const wgpuLib = currentSourcePath.parentDir/"wgpu-native"/"target"/"release/"
+import std/os
+const wgpuLib = currentSourcePath.parentDir/"wgpu-native/target/release/"
 
 when defined(WGPU_NATIVE_DYNLIB):
   const wgpudll = wgpuLib & "./" & (DynlibFormat % "wgpu_native")
-
   {.pragma: clib, cdecl, dynlib: wgpudll.}
 else:
   {.pragma: clib.}
