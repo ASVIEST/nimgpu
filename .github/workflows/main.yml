@@ -24,6 +24,10 @@ jobs:
         uses: actions-rs/toolchain@v1.0.6
         with:
           toolchain: stable
+      
+      #Install depot tools to build dawn
+      - name: Install depot tools
+        uses: newkdev/setup-depot-tools@v1.0.1
 
       - name: Generate bindings
         run: nimble generate -y
