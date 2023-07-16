@@ -71,18 +71,3 @@ class pub DawnGenerator:
           lastPart
       
       yield ("dawn"/folder/i.extractFilename, i.readFile)
-
-# const
-#   generatorDir = currentSourcePath.parentDir
-#   dawnDir = generatorDir/"dawn"
-
-# var t = DawnGenerator(
-#   dawnDir: dawnDir,
-#   settings: GeneratorSettings(
-#     genReleaseBuild: false,
-#     generatedFolder: "dawn"
-#   )
-# )
-
-# for i in t.virtualFS:
-#   i.create("aboba")
