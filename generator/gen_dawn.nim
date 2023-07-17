@@ -37,7 +37,7 @@ class pub DawnGenerator:
         gn gen "out"
     
     self.webgpuHeader = readFile(
-      self.dawnDir/"out/obj/include/dawn/webgpu.h"
+      self.dawnDir/"out/gen/include/dawn/webgpu.h"
     )
 
     
@@ -62,7 +62,7 @@ class pub DawnGenerator:
 
       yield ("headers/dawn"/folder/i.extractFilename, i.readFile)
     
-    walkDirRec(self.dawnDir/"out/obj/src/dawn").each i:
+    walkDirRec(self.dawnDir/"out/gen/src/dawn").each i:
       let folder = block:
         let lastPart = i.parentDir.lastPathPart
         
