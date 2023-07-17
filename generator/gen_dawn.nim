@@ -33,8 +33,8 @@ class pub DawnGenerator:
         cd ($self.dawnDir)
         cp scripts/standalone.gclient ".gclient"
         gclient sync
-        gn gen "out/"
-        tree
+        mkdir "out"
+        gn gen "out"
     
     self.webgpuHeader = readFile(
       self.dawnDir/"out/gen/include/dawn/webgpu.h"
