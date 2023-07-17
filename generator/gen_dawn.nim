@@ -28,12 +28,12 @@ class pub DawnGenerator:
     )
 
   proc generate: GeneratedFile =
+    createDir(self.dawnDir/"out")
     shell:
       one:
         cd ($self.dawnDir)
         cp scripts/standalone.gclient ".gclient"
         gclient sync
-        mkdir "out"
         gn gen "out"
         tree -d
     
