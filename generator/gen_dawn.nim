@@ -36,7 +36,6 @@ class pub DawnGenerator:
         gclient sync
         gn gen "out"
         mv "out/obj" "out/gen" 
-        tree -d
     
     self.webgpuHeader = readFile(
       self.dawnDir/"out/gen/include/dawn/webgpu.h"
