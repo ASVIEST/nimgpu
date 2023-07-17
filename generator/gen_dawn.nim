@@ -35,10 +35,9 @@ class pub DawnGenerator:
         cp scripts/standalone.gclient ".gclient"
         gclient sync
         gn gen "out"
-        mv -T "out/obj" "out/gen" 
     
     self.webgpuHeader = readFile(
-      self.dawnDir/"out/gen/include/dawn/webgpu.h"
+      self.dawnDir/"out/obj/include/dawn/webgpu.h"
     )
 
     
@@ -49,7 +48,7 @@ class pub DawnGenerator:
   iterator virtualFS*(): GeneratedFile=
     yield self.generate()
 
-    walkDir(self.dawnDir/"out/gen/include/dawn").each i:
+    walkDir(self.dawnDir/"out/obj/include/dawn").each i:
       yield ("headers/dawn"/i.path.extractFilename, i.path.readFile)
     
     walkDirRec(self.dawnDir/"include/dawn").each i:
@@ -63,7 +62,7 @@ class pub DawnGenerator:
 
       yield ("headers/dawn"/folder/i.extractFilename, i.readFile)
     
-    walkDirRec(self.dawnDir/"out/gen/src/dawn").each i:
+    walkDirRec(self.dawnDir/"out/obj/src/dawn").each i:
       let folder = block:
         let lastPart = i.parentDir.lastPathPart
         
