@@ -35,6 +35,7 @@ class pub DawnGenerator:
         cp scripts/standalone.gclient ".gclient"
         gclient sync
         gn gen "out"
+        mv "out/obj" "out/gen" 
         tree -d
     
     self.webgpuHeader = readFile(
