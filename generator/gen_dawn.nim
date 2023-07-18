@@ -37,7 +37,9 @@ class pub DawnGenerator:
       one:
         cd ($self.dawnDir)
         gn gen "out"
-        gn outputs "out"
+      one:
+        cd ($self.dawnDir) 
+        gn ls "out"
 
     echo "[INFO] out folder generated"
     
