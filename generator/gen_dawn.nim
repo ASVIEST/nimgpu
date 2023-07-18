@@ -36,6 +36,7 @@ class pub DawnGenerator:
         gclient sync
         gn gen "out"
         gn outputs
+    echo "[INFO] out folder generated"
     
     self.webgpuHeader = readFile(
       self.dawnDir/"out/gen/include/dawn/webgpu.h"
