@@ -38,8 +38,9 @@ class pub DawnGenerator:
         cd ($self.dawnDir)
         gn gen "out"
       one:
-        cd ($self.dawnDir) 
-        gn ls "out"
+        cd ($self.dawnDir/"out")
+        tree -d
+        
 
     echo "[INFO] out folder generated"
     
