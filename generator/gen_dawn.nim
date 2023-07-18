@@ -34,7 +34,7 @@ class pub DawnGenerator:
         cd ($self.dawnDir)
         cp scripts/standalone.gclient ".gclient"
         gclient sync
-       one:
+      one:
         cd ($self.dawnDir)
         gn gen "out"
         gn outputs "out"
