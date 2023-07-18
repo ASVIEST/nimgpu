@@ -35,7 +35,8 @@ class pub DawnGenerator:
         cp scripts/standalone.gclient ".gclient"
         gclient sync
         gn gen "out"
-        gn outputs
+        gn outputs "out"
+
     echo "[INFO] out folder generated"
     
     self.webgpuHeader = readFile(
