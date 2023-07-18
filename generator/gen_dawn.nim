@@ -38,7 +38,8 @@ class pub DawnGenerator:
         cd ($self.dawnDir)
         gn gen "out"
       one:
-        cd ($self.dawnDir/"out")
+        cd ($self.dawnDir)
+        cd "out"
         tree -d
         
 
