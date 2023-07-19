@@ -39,6 +39,7 @@ class pub DawnGenerator:
         gn gen "out/Debug"
       one:
         cd ($self.dawnDir)
+        ninja -C "out"
         cd "out"
         tree
         
