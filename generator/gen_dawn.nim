@@ -10,15 +10,8 @@ class pub DawnGenerator:
 
     webgpuHeader: string
 
-  const headerPrelude = dedent """
-    const includePaths =
-        "-I '$1/out/gen/include' " &
-        "-I '$1/include' "
-    
-    {.compile(
-        "$1/out/gen/src/dawn/dawn_proc.c", 
-        includePaths
-    ).}
+  const headerPrelude = dedent"""
+    {.compile("dawn/dawn_proc.c", "-I 'headers'").}
   """
 
   func preproc* =
@@ -36,15 +29,12 @@ class pub DawnGenerator:
         gclient sync
       one:
         cd ($self.dawnDir)
-        gn gen -C "out"
-      #one:
-      #  cd ($self.dawnDir)
-      #  ninja -C "out"
-      #  cd "out"
-      #  tree
-        
-
-    echo "[INFO] out folder generated"
+        gn gen "out"
+      one:
+        cd ($self.dawnDir)
+        ninja -C "out"
+        cd "out"
+        tree
     
     self.webgpuHeader = readFile(
       self.dawnDir/"out/gen/include/dawn/webgpu.h"
@@ -58,7 +48,7 @@ class pub DawnGenerator:
   iterator virtualFS*(): GeneratedFile=
     yield self.generate()
 
-    walkDir(self.dawnDir/"out/obj/include/dawn").each i:
+    walkDir(self.dawnDir/"out/gen/include/dawn").each i:
       yield ("headers/dawn"/i.path.extractFilename, i.path.readFile)
     
     walkDirRec(self.dawnDir/"include/dawn").each i:
