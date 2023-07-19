@@ -1,3 +1,2 @@
-generator/* linguist-vendored
-*.nim linguist-vendored=false
-*.nimble linguist-vendored=false
+generator/dawn/* linguist-vendored
+generator/wgpu-native/* linguist-vendored
