@@ -1,2 +1,1 @@
-generator/dawn/* linguist-vendored
-generator/wgpu-native/* linguist-vendored
+generator/** linguist-vendored
