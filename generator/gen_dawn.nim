@@ -27,14 +27,8 @@ class pub DawnGenerator:
         cd ($self.dawnDir)
         cp scripts/standalone.gclient ".gclient"
         gclient sync
-      one:
-        cd ($self.dawnDir)
         gn gen "out"
-      one:
-        cd ($self.dawnDir)
         ninja -C "out"
-        cd "out"
-        tree
     
     self.webgpuHeader = readFile(
       self.dawnDir/"out/gen/include/dawn/webgpu.h"
