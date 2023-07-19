@@ -1,0 +1,9 @@
+defines = -DUSE_UDEV -DUSE_AURA=1 -DUSE_GLIB=1 -DUSE_OZONE=1 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -DCR_CLANG_REVISION=\"llvmorg-17-init-2082-g6d4a674a-1\" -DCOMPONENT_BUILD -DCR_LIBCXX_REVISION=6f4617b9efc36525e030ec9855114f3c93550ec1 -D_LIBCPP_ENABLE_ASSERTIONS=1 -DCR_SYSROOT_KEY=20221105T211506Z-0 -D_DEBUG -DDYNAMIC_ANNOTATIONS_ENABLED=1
+include_dirs = -I.. -Igen -I../buildtools/third_party/libc++ -Igen/include -I../include
+label_name = cpp_headers
+target_out_dir = obj/include/dawn
+target_output_name = cpp_headers
+
+build obj/include/dawn/cpp_headers.inputdeps.stamp: stamp obj/include/dawn/cpp_headers_gen.stamp obj/include/dawn/headers_gen.stamp
+
+build obj/include/dawn/cpp_headers.stamp: stamp || obj/include/dawn/cpp_headers_gen.stamp obj/include/dawn/headers.stamp
