@@ -36,12 +36,12 @@ class pub DawnGenerator:
         gclient sync
       one:
         cd ($self.dawnDir)
-        gn gen "out"
-      one:
-        cd ($self.dawnDir)
-        ninja -C "out"
-        cd "out"
-        tree
+        gn gen -C "out"
+      #one:
+      #  cd ($self.dawnDir)
+      #  ninja -C "out"
+      #  cd "out"
+      #  tree
         
 
     echo "[INFO] out folder generated"
