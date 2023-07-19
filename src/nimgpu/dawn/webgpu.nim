@@ -1,13 +1,6 @@
 {.experimental: "codeReordering".}
 
-const includePaths =
-    "-I '/home/runner/work/nimgpu/nimgpu/generator/dawn/out/gen/include' " &
-    "-I '/home/runner/work/nimgpu/nimgpu/generator/dawn/include' "
-
-{.compile(
-    "/home/runner/work/nimgpu/nimgpu/generator/dawn/out/gen/src/dawn/dawn_proc.c",
-    includePaths
-).}
+{.compile("dawn/dawn_proc.c", "-I 'headers'").}
 
 
 type
