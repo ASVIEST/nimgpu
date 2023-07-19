@@ -36,7 +36,7 @@ class pub DawnGenerator:
         gclient sync
       one:
         cd ($self.dawnDir)
-        gn gen "out/Debug"
+        gn gen "out"
       one:
         cd ($self.dawnDir)
         ninja -C "out"
