@@ -17,7 +17,7 @@ func generatedFolder(b: Bindings): string=
       "wgpu_native"
 
 proc cli(bindings: Bindings, release: bool = false, `out`: string)=
-  const generatorDir = currentSourcePath.parentDir
+  const thirdPartyDir = currentSourcePath.parentDir/"third_party"
   
   
   let settings = GeneratorSettings(
@@ -29,13 +29,13 @@ proc cli(bindings: Bindings, release: bool = false, `out`: string)=
     of dawn:
       DawnGenerator(
         settings: settings,
-        dawnDir: generatorDir/"dawn"
+        dawnDir: thirdPartyDir/"dawn"
       ).generate(`out`)
 
     of `wgpu-native`:
       WgpuGenerator(
         settings: settings,
-        wgpuDir: generatorDir/"wgpu-native"
+        wgpuDir: thirdPartyDir/"wgpu-native"
       ).generate(`out`)
 
 dispatch cli

@@ -1,7 +1,7 @@
-[submodule "generator/wgpu-native"]
+[submodule "generator/third_party/wgpu-native"]
 	path = generator/wgpu-native
 	url = https://github.com/gfx-rs/wgpu-native
 
-[submodule "generator/dawn"]
+[submodule "generator/third_party/dawn"]
 	path = generator/dawn
 	url = https://dawn.googlesource.com/dawn
