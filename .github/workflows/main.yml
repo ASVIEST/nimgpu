@@ -2,7 +2,7 @@ name: bindings_generation
 on:
   push:
     paths:
-      - 'generator/**'
+      - 'generator/third_party/**'
   workflow_dispatch:
 
 jobs:
