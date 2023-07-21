@@ -71,10 +71,6 @@ type                        ##  Start at 6 to prevent collisions with webgpu STy
     dxilPath*: cstring
     dxcPath*: cstring
 
-  WGPUAdapterExtras* {.bycopy.} = object
-    chain*: WGPUChainedStruct
-    backend*: WGPUBackendType
-
   WGPUDeviceExtras* {.bycopy.} = object
     chain*: WGPUChainedStruct
     tracePath*: cstring
@@ -159,6 +155,10 @@ type                        ##  Start at 6 to prevent collisions with webgpu STy
     viewFormatCount*: csize_t
     viewFormats*: ptr WGPUTextureFormat
 
+  WGPUInstanceEnumerateAdapterOptions* {.bycopy.} = object
+    nextInChain*: ptr WGPUChainedStruct
+    backends*: WGPUInstanceBackendFlags
+
   WGPULogCallback* = proc (level: WGPULogLevel; message: cstring;
                            userdata: pointer)
 
@@ -171,7 +171,10 @@ const
 
 proc wgpuGenerateReport*(instance: WGPUInstance; report: ptr WGPUGlobalReport) {.
     importc: "wgpuGenerateReport", clib.}
-proc wgpuQueueSubmitForIndex*(queue: WGPUQueue; commandCount: uint32;
+proc wgpuInstanceEnumerateAdapters*(instance: WGPUInstance; options: ptr WGPUInstanceEnumerateAdapterOptions;
+                                    adapters: ptr WGPUAdapter): csize_t {.
+    importc: "wgpuInstanceEnumerateAdapters", clib.}
+proc wgpuQueueSubmitForIndex*(queue: WGPUQueue; commandCount: csize_t;
                               commands: ptr WGPUCommandBuffer): WGPUSubmissionIndex {.
     importc: "wgpuQueueSubmitForIndex", clib.}
 ##  Returns true if the queue is empty, or false if there are more queue submissions still in flight.
@@ -204,42 +207,3 @@ proc wgpuRenderPassEncoderMultiDrawIndexedIndirectCount*(
     encoder: WGPURenderPassEncoder; buffer: WGPUBuffer; offset: uint64;
     count_buffer: WGPUBuffer; count_buffer_offset: uint64; max_count: uint32) {.
     importc: "wgpuRenderPassEncoderMultiDrawIndexedIndirectCount", clib.}
-proc wgpuAdapterDrop*(adapter: WGPUAdapter) {.importc: "wgpuAdapterDrop", clib.}
-proc wgpuBindGroupDrop*(bindGroup: WGPUBindGroup) {.
-    importc: "wgpuBindGroupDrop", clib.}
-proc wgpuBindGroupLayoutDrop*(bindGroupLayout: WGPUBindGroupLayout) {.
-    importc: "wgpuBindGroupLayoutDrop", clib.}
-proc wgpuBufferDrop*(buffer: WGPUBuffer) {.importc: "wgpuBufferDrop", clib.}
-proc wgpuCommandBufferDrop*(commandBuffer: WGPUCommandBuffer) {.
-    importc: "wgpuCommandBufferDrop", clib.}
-proc wgpuCommandEncoderDrop*(commandEncoder: WGPUCommandEncoder) {.
-    importc: "wgpuCommandEncoderDrop", clib.}
-proc wgpuComputePassEncoderDrop*(computePassEncoder: WGPUComputePassEncoder) {.
-    importc: "wgpuComputePassEncoderDrop", clib.}
-proc wgpuComputePipelineDrop*(computePipeline: WGPUComputePipeline) {.
-    importc: "wgpuComputePipelineDrop", clib.}
-proc wgpuDeviceDrop*(device: WGPUDevice) {.importc: "wgpuDeviceDrop", clib.}
-proc wgpuInstanceDrop*(instance: WGPUInstance) {.importc: "wgpuInstanceDrop",
-    clib.}
-proc wgpuPipelineLayoutDrop*(pipelineLayout: WGPUPipelineLayout) {.
-    importc: "wgpuPipelineLayoutDrop", clib.}
-proc wgpuQuerySetDrop*(querySet: WGPUQuerySet) {.importc: "wgpuQuerySetDrop",
-    clib.}
-proc wgpuQueueDrop*(queue: WGPUQueue) {.importc: "wgpuQueueDrop", clib.}
-proc wgpuRenderBundleDrop*(renderBundle: WGPURenderBundle) {.
-    importc: "wgpuRenderBundleDrop", clib.}
-proc wgpuRenderBundleEncoderDrop*(renderBundleEncoder: WGPURenderBundleEncoder) {.
-    importc: "wgpuRenderBundleEncoderDrop", clib.}
-proc wgpuRenderPassEncoderDrop*(renderPassEncoder: WGPURenderPassEncoder) {.
-    importc: "wgpuRenderPassEncoderDrop", clib.}
-proc wgpuRenderPipelineDrop*(renderPipeline: WGPURenderPipeline) {.
-    importc: "wgpuRenderPipelineDrop", clib.}
-proc wgpuSamplerDrop*(sampler: WGPUSampler) {.importc: "wgpuSamplerDrop", clib.}
-proc wgpuShaderModuleDrop*(shaderModule: WGPUShaderModule) {.
-    importc: "wgpuShaderModuleDrop", clib.}
-proc wgpuSurfaceDrop*(surface: WGPUSurface) {.importc: "wgpuSurfaceDrop", clib.}
-proc wgpuSwapChainDrop*(swapChain: WGPUSwapChain) {.
-    importc: "wgpuSwapChainDrop", clib.}
-proc wgpuTextureDrop*(texture: WGPUTexture) {.importc: "wgpuTextureDrop", clib.}
-proc wgpuTextureViewDrop*(textureView: WGPUTextureView) {.
-    importc: "wgpuTextureViewDrop", clib.}

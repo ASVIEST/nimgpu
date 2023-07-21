@@ -58,11 +58,11 @@ type
     WGPUAddressMode_ClampToEdge = 0x00000002,
     WGPUAddressMode_Force32 = 0x7FFFFFFF
   WGPUBackendType* = enum
-    WGPUBackendType_Null = 0x00000000, WGPUBackendType_WebGPU = 0x00000001,
-    WGPUBackendType_D3D11 = 0x00000002, WGPUBackendType_D3D12 = 0x00000003,
-    WGPUBackendType_Metal = 0x00000004, WGPUBackendType_Vulkan = 0x00000005,
-    WGPUBackendType_OpenGL = 0x00000006, WGPUBackendType_OpenGLES = 0x00000007,
-    WGPUBackendType_Force32 = 0x7FFFFFFF
+    WGPUBackendType_Undefined = 0x00000000, WGPUBackendType_Null = 0x00000001,
+    WGPUBackendType_WebGPU = 0x00000002, WGPUBackendType_D3D11 = 0x00000003,
+    WGPUBackendType_D3D12 = 0x00000004, WGPUBackendType_Metal = 0x00000005,
+    WGPUBackendType_Vulkan = 0x00000006, WGPUBackendType_OpenGL = 0x00000007,
+    WGPUBackendType_OpenGLES = 0x00000008, WGPUBackendType_Force32 = 0x7FFFFFFF
   WGPUBlendFactor* = enum
     WGPUBlendFactor_Zero = 0x00000000, WGPUBlendFactor_One = 0x00000001,
     WGPUBlendFactor_Src = 0x00000002, WGPUBlendFactor_OneMinusSrc = 0x00000003,
@@ -89,11 +89,14 @@ type
     WGPUBufferBindingType_Force32 = 0x7FFFFFFF
   WGPUBufferMapAsyncStatus* = enum
     WGPUBufferMapAsyncStatus_Success = 0x00000000,
-    WGPUBufferMapAsyncStatus_Error = 0x00000001,
+    WGPUBufferMapAsyncStatus_ValidationError = 0x00000001,
     WGPUBufferMapAsyncStatus_Unknown = 0x00000002,
     WGPUBufferMapAsyncStatus_DeviceLost = 0x00000003,
     WGPUBufferMapAsyncStatus_DestroyedBeforeCallback = 0x00000004,
     WGPUBufferMapAsyncStatus_UnmappedBeforeCallback = 0x00000005,
+    WGPUBufferMapAsyncStatus_MappingAlreadyPending = 0x00000006,
+    WGPUBufferMapAsyncStatus_OffsetOutOfRange = 0x00000007,
+    WGPUBufferMapAsyncStatus_SizeOutOfRange = 0x00000008,
     WGPUBufferMapAsyncStatus_Force32 = 0x7FFFFFFF
   WGPUBufferMapState* = enum
     WGPUBufferMapState_Unmapped = 0x00000000,
@@ -163,6 +166,7 @@ type
     WGPUFeatureName_ShaderF16 = 0x00000009,
     WGPUFeatureName_RG11B10UfloatRenderable = 0x0000000A,
     WGPUFeatureName_BGRA8UnormStorage = 0x0000000B,
+    WGPUFeatureName_Float32Filterable = 0x0000000C,
     WGPUFeatureName_Force32 = 0x7FFFFFFF
   WGPUFilterMode* = enum
     WGPUFilterMode_Nearest = 0x00000000, WGPUFilterMode_Linear = 0x00000001,
@@ -270,12 +274,6 @@ type
     WGPUTextureAspect_StencilOnly = 0x00000001,
     WGPUTextureAspect_DepthOnly = 0x00000002,
     WGPUTextureAspect_Force32 = 0x7FFFFFFF
-  WGPUTextureComponentType* = enum
-    WGPUTextureComponentType_Float = 0x00000000,
-    WGPUTextureComponentType_Sint = 0x00000001,
-    WGPUTextureComponentType_Uint = 0x00000002,
-    WGPUTextureComponentType_DepthComparison = 0x00000003,
-    WGPUTextureComponentType_Force32 = 0x7FFFFFFF
   WGPUTextureDimension* = enum
     WGPUTextureDimension_1D = 0x00000000, WGPUTextureDimension_2D = 0x00000001,
     WGPUTextureDimension_3D = 0x00000002,
@@ -464,6 +462,29 @@ type
     WGPUTextureUsage_RenderAttachment = 0x00000010,
     WGPUTextureUsage_Force32 = 0x7FFFFFFF
   WGPUTextureUsageFlags* = WGPUFlags
+  WGPUBufferMapCallback* = proc (status: WGPUBufferMapAsyncStatus;
+                                 userdata: pointer)
+  WGPUCompilationInfoCallback* = proc (status: WGPUCompilationInfoRequestStatus;
+      compilationInfo: ptr WGPUCompilationInfo; userdata: pointer)
+  WGPUCreateComputePipelineAsyncCallback* = proc (
+      status: WGPUCreatePipelineAsyncStatus; pipeline: WGPUComputePipeline;
+      message: cstring; userdata: pointer)
+  WGPUCreateRenderPipelineAsyncCallback* = proc (
+      status: WGPUCreatePipelineAsyncStatus; pipeline: WGPURenderPipeline;
+      message: cstring; userdata: pointer)
+  WGPUDeviceLostCallback* = proc (reason: WGPUDeviceLostReason;
+                                  message: cstring; userdata: pointer)
+  WGPUErrorCallback* = proc (`type`: WGPUErrorType; message: cstring;
+                             userdata: pointer)
+  WGPUProc* = proc ()
+  WGPUQueueWorkDoneCallback* = proc (status: WGPUQueueWorkDoneStatus;
+                                     userdata: pointer)
+  WGPURequestAdapterCallback* = proc (status: WGPURequestAdapterStatus;
+                                      adapter: WGPUAdapter; message: cstring;
+                                      userdata: pointer)
+  WGPURequestDeviceCallback* = proc (status: WGPURequestDeviceStatus;
+                                     device: WGPUDevice; message: cstring;
+                                     userdata: pointer)
   WGPUChainedStruct* {.bycopy.} = object
     next*: ptr WGPUChainedStruct
     sType*: WGPUSType
@@ -487,13 +508,10 @@ type
     nextInChain*: ptr WGPUChainedStruct
     binding*: uint32
     buffer*: WGPUBuffer
-    ##  nullable
     offset*: uint64
     size*: uint64
     sampler*: WGPUSampler
-    ##  nullable
     textureView*: WGPUTextureView
-    ##  nullable
 
   WGPUBlendComponent* {.bycopy.} = object
     operation*: WGPUBlendOperation
@@ -509,7 +527,6 @@ type
   WGPUBufferDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
     usage*: WGPUBufferUsageFlags
     size*: uint64
     mappedAtCreation*: bool
@@ -523,17 +540,14 @@ type
   WGPUCommandBufferDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
 
   WGPUCommandEncoderDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
 
   WGPUCompilationMessage* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     message*: cstring
-    ##  nullable
     `type`*: WGPUCompilationMessageType
     lineNum*: uint64
     linePos*: uint64
@@ -608,10 +622,8 @@ type
   WGPUPipelineLayoutDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
-    bindGroupLayoutCount*: uint32
+    bindGroupLayoutCount*: csize_t
     bindGroupLayouts*: ptr WGPUBindGroupLayout
-
 
 
 
@@ -680,27 +692,23 @@ type
   WGPUQuerySetDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
     `type`*: WGPUQueryType
     count*: uint32
     pipelineStatistics*: ptr WGPUPipelineStatisticName
-    pipelineStatisticsCount*: uint32
+    pipelineStatisticsCount*: csize_t
 
   WGPUQueueDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
 
   WGPURenderBundleDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
 
   WGPURenderBundleEncoderDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
-    colorFormatsCount*: uint32
+    colorFormatsCount*: csize_t
     colorFormats*: ptr WGPUTextureFormat
     depthStencilFormat*: WGPUTextureFormat
     sampleCount*: uint32
@@ -734,8 +742,8 @@ type
   WGPURequestAdapterOptions* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     compatibleSurface*: WGPUSurface
-    ##  nullable
     powerPreference*: WGPUPowerPreference
+    backendType*: WGPUBackendType
     forceFallbackAdapter*: bool
 
   WGPUSamplerBindingLayout* {.bycopy.} = object
@@ -745,7 +753,6 @@ type
   WGPUSamplerDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
     addressModeU*: WGPUAddressMode
     addressModeV*: WGPUAddressMode
     addressModeW*: WGPUAddressMode
@@ -794,7 +801,6 @@ type
   WGPUSurfaceDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
 
 
 ##  Can be chained in WGPUSurfaceDescriptor
@@ -859,7 +865,6 @@ type
   WGPUSwapChainDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
     usage*: WGPUTextureUsageFlags
     format*: WGPUTextureFormat
     width*: uint32
@@ -881,7 +886,6 @@ type
   WGPUTextureViewDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
     format*: WGPUTextureFormat
     dimension*: WGPUTextureViewDimension
     baseMipLevel*: uint32
@@ -898,9 +902,8 @@ type
   WGPUBindGroupDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
     layout*: WGPUBindGroupLayout
-    entryCount*: uint32
+    entryCount*: csize_t
     entries*: ptr WGPUBindGroupEntry
 
   WGPUBindGroupLayoutEntry* {.bycopy.} = object
@@ -918,14 +921,13 @@ type
 
   WGPUCompilationInfo* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
-    messageCount*: uint32
+    messageCount*: csize_t
     messages*: ptr WGPUCompilationMessage
 
   WGPUComputePassDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
-    timestampWriteCount*: uint32
+    timestampWriteCount*: csize_t
     timestampWrites*: ptr WGPUComputePassTimestampWrite
 
   WGPUDepthStencilState* {.bycopy.} = object
@@ -957,14 +959,12 @@ type
     nextInChain*: ptr WGPUChainedStruct
     module*: WGPUShaderModule
     entryPoint*: cstring
-    constantCount*: uint32
+    constantCount*: csize_t
     constants*: ptr WGPUConstantEntry
 
   WGPURenderPassColorAttachment* {.bycopy.} = object
     view*: WGPUTextureView
-    ##  nullable
     resolveTarget*: WGPUTextureView
-    ##  nullable
     loadOp*: WGPULoadOp
     storeOp*: WGPUStoreOp
     clearValue*: WGPUColor
@@ -976,8 +976,7 @@ type
   WGPUShaderModuleDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
-    hintCount*: uint32
+    hintCount*: csize_t
     hints*: ptr WGPUShaderModuleCompilationHint
 
   WGPUSupportedLimits* {.bycopy.} = object
@@ -987,122 +986,87 @@ type
   WGPUTextureDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
     usage*: WGPUTextureUsageFlags
     dimension*: WGPUTextureDimension
     size*: WGPUExtent3D
     format*: WGPUTextureFormat
     mipLevelCount*: uint32
     sampleCount*: uint32
-    viewFormatCount*: uint32
+    viewFormatCount*: csize_t
     viewFormats*: ptr WGPUTextureFormat
 
   WGPUVertexBufferLayout* {.bycopy.} = object
     arrayStride*: uint64
     stepMode*: WGPUVertexStepMode
-    attributeCount*: uint32
+    attributeCount*: csize_t
     attributes*: ptr WGPUVertexAttribute
 
   WGPUBindGroupLayoutDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
-    entryCount*: uint32
+    entryCount*: csize_t
     entries*: ptr WGPUBindGroupLayoutEntry
 
   WGPUColorTargetState* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     format*: WGPUTextureFormat
     blend*: ptr WGPUBlendState
-    ##  nullable
     writeMask*: WGPUColorWriteMaskFlags
 
   WGPUComputePipelineDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
     layout*: WGPUPipelineLayout
-    ##  nullable
     compute*: WGPUProgrammableStageDescriptor
 
   WGPUDeviceDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
-    requiredFeaturesCount*: uint32
+    requiredFeaturesCount*: csize_t
     requiredFeatures*: ptr WGPUFeatureName
     requiredLimits*: ptr WGPURequiredLimits
-    ##  nullable
     defaultQueue*: WGPUQueueDescriptor
+    deviceLostCallback*: WGPUDeviceLostCallback
+    deviceLostUserdata*: pointer
 
   WGPURenderPassDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
-    colorAttachmentCount*: uint32
+    colorAttachmentCount*: csize_t
     colorAttachments*: ptr WGPURenderPassColorAttachment
     depthStencilAttachment*: ptr WGPURenderPassDepthStencilAttachment
-    ##  nullable
     occlusionQuerySet*: WGPUQuerySet
-    ##  nullable
-    timestampWriteCount*: uint32
+    timestampWriteCount*: csize_t
     timestampWrites*: ptr WGPURenderPassTimestampWrite
 
   WGPUVertexState* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     module*: WGPUShaderModule
     entryPoint*: cstring
-    constantCount*: uint32
+    constantCount*: csize_t
     constants*: ptr WGPUConstantEntry
-    bufferCount*: uint32
+    bufferCount*: csize_t
     buffers*: ptr WGPUVertexBufferLayout
 
   WGPUFragmentState* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     module*: WGPUShaderModule
     entryPoint*: cstring
-    constantCount*: uint32
+    constantCount*: csize_t
     constants*: ptr WGPUConstantEntry
-    targetCount*: uint32
+    targetCount*: csize_t
     targets*: ptr WGPUColorTargetState
 
   WGPURenderPipelineDescriptor* {.bycopy.} = object
     nextInChain*: ptr WGPUChainedStruct
     label*: cstring
-    ##  nullable
     layout*: WGPUPipelineLayout
-    ##  nullable
     vertex*: WGPUVertexState
     primitive*: WGPUPrimitiveState
     depthStencil*: ptr WGPUDepthStencilState
-    ##  nullable
     multisample*: WGPUMultisampleState
     fragment*: ptr WGPUFragmentState
-    ##  nullable
 
-  WGPUBufferMapCallback* = proc (status: WGPUBufferMapAsyncStatus;
-                                 userdata: pointer)
-  WGPUCompilationInfoCallback* = proc (status: WGPUCompilationInfoRequestStatus;
-      compilationInfo: ptr WGPUCompilationInfo; userdata: pointer)
-  WGPUCreateComputePipelineAsyncCallback* = proc (
-      status: WGPUCreatePipelineAsyncStatus; pipeline: WGPUComputePipeline;
-      message: cstring; userdata: pointer)
-  WGPUCreateRenderPipelineAsyncCallback* = proc (
-      status: WGPUCreatePipelineAsyncStatus; pipeline: WGPURenderPipeline;
-      message: cstring; userdata: pointer)
-  WGPUDeviceLostCallback* = proc (reason: WGPUDeviceLostReason;
-                                  message: cstring; userdata: pointer)
-  WGPUErrorCallback* = proc (`type`: WGPUErrorType; message: cstring;
-                             userdata: pointer)
-  WGPUProc* = proc ()
-  WGPUQueueWorkDoneCallback* = proc (status: WGPUQueueWorkDoneStatus;
-                                     userdata: pointer)
-  WGPURequestAdapterCallback* = proc (status: WGPURequestAdapterStatus;
-                                      adapter: WGPUAdapter; message: cstring;
-                                      userdata: pointer)
-  WGPURequestDeviceCallback* = proc (status: WGPURequestDeviceStatus;
-                                     device: WGPUDevice; message: cstring;
-                                     userdata: pointer)
 
 when not defined(WGPU_SKIP_PROCS):
   type
@@ -1118,15 +1082,23 @@ when not defined(WGPU_SKIP_PROCS):
         properties: ptr WGPUAdapterProperties)
     WGPUProcAdapterHasFeature* = proc (adapter: WGPUAdapter;
                                        feature: WGPUFeatureName): bool
-    WGPUProcAdapterRequestDevice* = proc (adapter: WGPUAdapter; descriptor: ptr WGPUDeviceDescriptor; ##  nullable
+    WGPUProcAdapterRequestDevice* = proc (adapter: WGPUAdapter;
+        descriptor: ptr WGPUDeviceDescriptor;
         callback: WGPURequestDeviceCallback; userdata: pointer)
+    WGPUProcAdapterReference* = proc (adapter: WGPUAdapter)
+    WGPUProcAdapterRelease* = proc (adapter: WGPUAdapter)
   ##  Procs of BindGroup
   type
     WGPUProcBindGroupSetLabel* = proc (bindGroup: WGPUBindGroup; label: cstring)
+    WGPUProcBindGroupReference* = proc (bindGroup: WGPUBindGroup)
+    WGPUProcBindGroupRelease* = proc (bindGroup: WGPUBindGroup)
   ##  Procs of BindGroupLayout
   type
     WGPUProcBindGroupLayoutSetLabel* = proc (
         bindGroupLayout: WGPUBindGroupLayout; label: cstring)
+    WGPUProcBindGroupLayoutReference* = proc (
+        bindGroupLayout: WGPUBindGroupLayout)
+    WGPUProcBindGroupLayoutRelease* = proc (bindGroupLayout: WGPUBindGroupLayout)
   ##  Procs of Buffer
   type
     WGPUProcBufferDestroy* = proc (buffer: WGPUBuffer)
@@ -1136,21 +1108,26 @@ when not defined(WGPU_SKIP_PROCS):
     WGPUProcBufferGetMappedRange* = proc (buffer: WGPUBuffer; offset: csize_t;
         size: csize_t): pointer
     WGPUProcBufferGetSize* = proc (buffer: WGPUBuffer): uint64
-    WGPUProcBufferGetUsage* = proc (buffer: WGPUBuffer): WGPUBufferUsage
+    WGPUProcBufferGetUsage* = proc (buffer: WGPUBuffer): WGPUBufferUsageFlags
     WGPUProcBufferMapAsync* = proc (buffer: WGPUBuffer; mode: WGPUMapModeFlags;
                                     offset: csize_t; size: csize_t;
                                     callback: WGPUBufferMapCallback;
                                     userdata: pointer)
     WGPUProcBufferSetLabel* = proc (buffer: WGPUBuffer; label: cstring)
     WGPUProcBufferUnmap* = proc (buffer: WGPUBuffer)
+    WGPUProcBufferReference* = proc (buffer: WGPUBuffer)
+    WGPUProcBufferRelease* = proc (buffer: WGPUBuffer)
   ##  Procs of CommandBuffer
   type
     WGPUProcCommandBufferSetLabel* = proc (commandBuffer: WGPUCommandBuffer;
         label: cstring)
+    WGPUProcCommandBufferReference* = proc (commandBuffer: WGPUCommandBuffer)
+    WGPUProcCommandBufferRelease* = proc (commandBuffer: WGPUCommandBuffer)
   ##  Procs of CommandEncoder
   type
     WGPUProcCommandEncoderBeginComputePass* = proc (
-        commandEncoder: WGPUCommandEncoder; descriptor: ptr WGPUComputePassDescriptor): WGPUComputePassEncoder ##  nullable
+        commandEncoder: WGPUCommandEncoder;
+        descriptor: ptr WGPUComputePassDescriptor): WGPUComputePassEncoder
     WGPUProcCommandEncoderBeginRenderPass* = proc (
         commandEncoder: WGPUCommandEncoder;
         descriptor: ptr WGPURenderPassDescriptor): WGPURenderPassEncoder
@@ -1170,7 +1147,8 @@ when not defined(WGPU_SKIP_PROCS):
     WGPUProcCommandEncoderCopyTextureToTexture* = proc (
         commandEncoder: WGPUCommandEncoder; source: ptr WGPUImageCopyTexture;
         destination: ptr WGPUImageCopyTexture; copySize: ptr WGPUExtent3D)
-    WGPUProcCommandEncoderFinish* = proc (commandEncoder: WGPUCommandEncoder; descriptor: ptr WGPUCommandBufferDescriptor): WGPUCommandBuffer ##  nullable
+    WGPUProcCommandEncoderFinish* = proc (commandEncoder: WGPUCommandEncoder;
+        descriptor: ptr WGPUCommandBufferDescriptor): WGPUCommandBuffer
     WGPUProcCommandEncoderInsertDebugMarker* = proc (
         commandEncoder: WGPUCommandEncoder; markerLabel: cstring)
     WGPUProcCommandEncoderPopDebugGroup* = proc (
@@ -1186,6 +1164,8 @@ when not defined(WGPU_SKIP_PROCS):
     WGPUProcCommandEncoderWriteTimestamp* = proc (
         commandEncoder: WGPUCommandEncoder; querySet: WGPUQuerySet;
         queryIndex: uint32)
+    WGPUProcCommandEncoderReference* = proc (commandEncoder: WGPUCommandEncoder)
+    WGPUProcCommandEncoderRelease* = proc (commandEncoder: WGPUCommandEncoder)
   ##  Procs of ComputePassEncoder
   type
     WGPUProcComputePassEncoderBeginPipelineStatisticsQuery* = proc (
@@ -1209,19 +1189,26 @@ when not defined(WGPU_SKIP_PROCS):
         computePassEncoder: WGPUComputePassEncoder; groupLabel: cstring)
     WGPUProcComputePassEncoderSetBindGroup* = proc (
         computePassEncoder: WGPUComputePassEncoder; groupIndex: uint32;
-        group: WGPUBindGroup; dynamicOffsetCount: uint32;
+        group: WGPUBindGroup; dynamicOffsetCount: csize_t;
         dynamicOffsets: ptr uint32)
     WGPUProcComputePassEncoderSetLabel* = proc (
         computePassEncoder: WGPUComputePassEncoder; label: cstring)
     WGPUProcComputePassEncoderSetPipeline* = proc (
         computePassEncoder: WGPUComputePassEncoder;
         pipeline: WGPUComputePipeline)
+    WGPUProcComputePassEncoderReference* = proc (
+        computePassEncoder: WGPUComputePassEncoder)
+    WGPUProcComputePassEncoderRelease* = proc (
+        computePassEncoder: WGPUComputePassEncoder)
   ##  Procs of ComputePipeline
   type
     WGPUProcComputePipelineGetBindGroupLayout* = proc (
         computePipeline: WGPUComputePipeline; groupIndex: uint32): WGPUBindGroupLayout
     WGPUProcComputePipelineSetLabel* = proc (
         computePipeline: WGPUComputePipeline; label: cstring)
+    WGPUProcComputePipelineReference* = proc (
+        computePipeline: WGPUComputePipeline)
+    WGPUProcComputePipelineRelease* = proc (computePipeline: WGPUComputePipeline)
   ##  Procs of Device
   type
     WGPUProcDeviceCreateBindGroup* = proc (device: WGPUDevice;
@@ -1230,7 +1217,8 @@ when not defined(WGPU_SKIP_PROCS):
         descriptor: ptr WGPUBindGroupLayoutDescriptor): WGPUBindGroupLayout
     WGPUProcDeviceCreateBuffer* = proc (device: WGPUDevice;
                                         descriptor: ptr WGPUBufferDescriptor): WGPUBuffer
-    WGPUProcDeviceCreateCommandEncoder* = proc (device: WGPUDevice; descriptor: ptr WGPUCommandEncoderDescriptor): WGPUCommandEncoder ##  nullable
+    WGPUProcDeviceCreateCommandEncoder* = proc (device: WGPUDevice;
+        descriptor: ptr WGPUCommandEncoderDescriptor): WGPUCommandEncoder
     WGPUProcDeviceCreateComputePipeline* = proc (device: WGPUDevice;
         descriptor: ptr WGPUComputePipelineDescriptor): WGPUComputePipeline
     WGPUProcDeviceCreateComputePipelineAsync* = proc (device: WGPUDevice;
@@ -1247,7 +1235,8 @@ when not defined(WGPU_SKIP_PROCS):
     WGPUProcDeviceCreateRenderPipelineAsync* = proc (device: WGPUDevice;
         descriptor: ptr WGPURenderPipelineDescriptor;
         callback: WGPUCreateRenderPipelineAsyncCallback; userdata: pointer)
-    WGPUProcDeviceCreateSampler* = proc (device: WGPUDevice; descriptor: ptr WGPUSamplerDescriptor): WGPUSampler ##  nullable
+    WGPUProcDeviceCreateSampler* = proc (device: WGPUDevice;
+        descriptor: ptr WGPUSamplerDescriptor): WGPUSampler
     WGPUProcDeviceCreateShaderModule* = proc (device: WGPUDevice;
         descriptor: ptr WGPUShaderModuleDescriptor): WGPUShaderModule
     WGPUProcDeviceCreateSwapChain* = proc (device: WGPUDevice;
@@ -1263,37 +1252,44 @@ when not defined(WGPU_SKIP_PROCS):
     WGPUProcDeviceHasFeature* = proc (device: WGPUDevice;
                                       feature: WGPUFeatureName): bool
     WGPUProcDevicePopErrorScope* = proc (device: WGPUDevice;
-        callback: WGPUErrorCallback; userdata: pointer): bool
+        callback: WGPUErrorCallback; userdata: pointer)
     WGPUProcDevicePushErrorScope* = proc (device: WGPUDevice;
         filter: WGPUErrorFilter)
-    WGPUProcDeviceSetDeviceLostCallback* = proc (device: WGPUDevice;
-        callback: WGPUDeviceLostCallback; userdata: pointer)
     WGPUProcDeviceSetLabel* = proc (device: WGPUDevice; label: cstring)
     WGPUProcDeviceSetUncapturedErrorCallback* = proc (device: WGPUDevice;
         callback: WGPUErrorCallback; userdata: pointer)
+    WGPUProcDeviceReference* = proc (device: WGPUDevice)
+    WGPUProcDeviceRelease* = proc (device: WGPUDevice)
   ##  Procs of Instance
   type
     WGPUProcInstanceCreateSurface* = proc (instance: WGPUInstance;
         descriptor: ptr WGPUSurfaceDescriptor): WGPUSurface
     WGPUProcInstanceProcessEvents* = proc (instance: WGPUInstance)
-    WGPUProcInstanceRequestAdapter* = proc (instance: WGPUInstance; options: ptr WGPURequestAdapterOptions; ##  nullable
+    WGPUProcInstanceRequestAdapter* = proc (instance: WGPUInstance;
+        options: ptr WGPURequestAdapterOptions;
         callback: WGPURequestAdapterCallback; userdata: pointer)
+    WGPUProcInstanceReference* = proc (instance: WGPUInstance)
+    WGPUProcInstanceRelease* = proc (instance: WGPUInstance)
   ##  Procs of PipelineLayout
   type
     WGPUProcPipelineLayoutSetLabel* = proc (pipelineLayout: WGPUPipelineLayout;
         label: cstring)
+    WGPUProcPipelineLayoutReference* = proc (pipelineLayout: WGPUPipelineLayout)
+    WGPUProcPipelineLayoutRelease* = proc (pipelineLayout: WGPUPipelineLayout)
   ##  Procs of QuerySet
   type
     WGPUProcQuerySetDestroy* = proc (querySet: WGPUQuerySet)
     WGPUProcQuerySetGetCount* = proc (querySet: WGPUQuerySet): uint32
     WGPUProcQuerySetGetType* = proc (querySet: WGPUQuerySet): WGPUQueryType
     WGPUProcQuerySetSetLabel* = proc (querySet: WGPUQuerySet; label: cstring)
+    WGPUProcQuerySetReference* = proc (querySet: WGPUQuerySet)
+    WGPUProcQuerySetRelease* = proc (querySet: WGPUQuerySet)
   ##  Procs of Queue
   type
     WGPUProcQueueOnSubmittedWorkDone* = proc (queue: WGPUQueue;
         callback: WGPUQueueWorkDoneCallback; userdata: pointer)
     WGPUProcQueueSetLabel* = proc (queue: WGPUQueue; label: cstring)
-    WGPUProcQueueSubmit* = proc (queue: WGPUQueue; commandCount: uint32;
+    WGPUProcQueueSubmit* = proc (queue: WGPUQueue; commandCount: csize_t;
                                  commands: ptr WGPUCommandBuffer)
     WGPUProcQueueWriteBuffer* = proc (queue: WGPUQueue; buffer: WGPUBuffer;
                                       bufferOffset: uint64; data: pointer;
@@ -1303,6 +1299,14 @@ when not defined(WGPU_SKIP_PROCS):
                                        data: pointer; dataSize: csize_t;
                                        dataLayout: ptr WGPUTextureDataLayout;
                                        writeSize: ptr WGPUExtent3D)
+    WGPUProcQueueReference* = proc (queue: WGPUQueue)
+    WGPUProcQueueRelease* = proc (queue: WGPUQueue)
+  ##  Procs of RenderBundle
+  type
+    WGPUProcRenderBundleSetLabel* = proc (renderBundle: WGPURenderBundle;
+        label: cstring)
+    WGPUProcRenderBundleReference* = proc (renderBundle: WGPURenderBundle)
+    WGPUProcRenderBundleRelease* = proc (renderBundle: WGPURenderBundle)
   ##  Procs of RenderBundleEncoder
   type
     WGPUProcRenderBundleEncoderDraw* = proc (
@@ -1319,7 +1323,8 @@ when not defined(WGPU_SKIP_PROCS):
         renderBundleEncoder: WGPURenderBundleEncoder;
         indirectBuffer: WGPUBuffer; indirectOffset: uint64)
     WGPUProcRenderBundleEncoderFinish* = proc (
-        renderBundleEncoder: WGPURenderBundleEncoder; descriptor: ptr WGPURenderBundleDescriptor): WGPURenderBundle ##  nullable
+        renderBundleEncoder: WGPURenderBundleEncoder;
+        descriptor: ptr WGPURenderBundleDescriptor): WGPURenderBundle
     WGPUProcRenderBundleEncoderInsertDebugMarker* = proc (
         renderBundleEncoder: WGPURenderBundleEncoder; markerLabel: cstring)
     WGPUProcRenderBundleEncoderPopDebugGroup* = proc (
@@ -1328,7 +1333,7 @@ when not defined(WGPU_SKIP_PROCS):
         renderBundleEncoder: WGPURenderBundleEncoder; groupLabel: cstring)
     WGPUProcRenderBundleEncoderSetBindGroup* = proc (
         renderBundleEncoder: WGPURenderBundleEncoder; groupIndex: uint32;
-        group: WGPUBindGroup; dynamicOffsetCount: uint32;
+        group: WGPUBindGroup; dynamicOffsetCount: csize_t;
         dynamicOffsets: ptr uint32)
     WGPUProcRenderBundleEncoderSetIndexBuffer* = proc (
         renderBundleEncoder: WGPURenderBundleEncoder; buffer: WGPUBuffer;
@@ -1341,6 +1346,10 @@ when not defined(WGPU_SKIP_PROCS):
     WGPUProcRenderBundleEncoderSetVertexBuffer* = proc (
         renderBundleEncoder: WGPURenderBundleEncoder; slot: uint32;
         buffer: WGPUBuffer; offset: uint64; size: uint64)
+    WGPUProcRenderBundleEncoderReference* = proc (
+        renderBundleEncoder: WGPURenderBundleEncoder)
+    WGPUProcRenderBundleEncoderRelease* = proc (
+        renderBundleEncoder: WGPURenderBundleEncoder)
   ##  Procs of RenderPassEncoder
   type
     WGPUProcRenderPassEncoderBeginOcclusionQuery* = proc (
@@ -1368,7 +1377,7 @@ when not defined(WGPU_SKIP_PROCS):
     WGPUProcRenderPassEncoderEndPipelineStatisticsQuery* = proc (
         renderPassEncoder: WGPURenderPassEncoder)
     WGPUProcRenderPassEncoderExecuteBundles* = proc (
-        renderPassEncoder: WGPURenderPassEncoder; bundleCount: uint32;
+        renderPassEncoder: WGPURenderPassEncoder; bundleCount: csize_t;
         bundles: ptr WGPURenderBundle)
     WGPUProcRenderPassEncoderInsertDebugMarker* = proc (
         renderPassEncoder: WGPURenderPassEncoder; markerLabel: cstring)
@@ -1378,7 +1387,7 @@ when not defined(WGPU_SKIP_PROCS):
         renderPassEncoder: WGPURenderPassEncoder; groupLabel: cstring)
     WGPUProcRenderPassEncoderSetBindGroup* = proc (
         renderPassEncoder: WGPURenderPassEncoder; groupIndex: uint32;
-        group: WGPUBindGroup; dynamicOffsetCount: uint32;
+        group: WGPUBindGroup; dynamicOffsetCount: csize_t;
         dynamicOffsets: ptr uint32)
     WGPUProcRenderPassEncoderSetBlendConstant* = proc (
         renderPassEncoder: WGPURenderPassEncoder; color: ptr WGPUColor)
@@ -1400,15 +1409,23 @@ when not defined(WGPU_SKIP_PROCS):
     WGPUProcRenderPassEncoderSetViewport* = proc (
         renderPassEncoder: WGPURenderPassEncoder; x: cfloat; y: cfloat;
         width: cfloat; height: cfloat; minDepth: cfloat; maxDepth: cfloat)
+    WGPUProcRenderPassEncoderReference* = proc (
+        renderPassEncoder: WGPURenderPassEncoder)
+    WGPUProcRenderPassEncoderRelease* = proc (
+        renderPassEncoder: WGPURenderPassEncoder)
   ##  Procs of RenderPipeline
   type
     WGPUProcRenderPipelineGetBindGroupLayout* = proc (
         renderPipeline: WGPURenderPipeline; groupIndex: uint32): WGPUBindGroupLayout
     WGPUProcRenderPipelineSetLabel* = proc (renderPipeline: WGPURenderPipeline;
         label: cstring)
+    WGPUProcRenderPipelineReference* = proc (renderPipeline: WGPURenderPipeline)
+    WGPUProcRenderPipelineRelease* = proc (renderPipeline: WGPURenderPipeline)
   ##  Procs of Sampler
   type
     WGPUProcSamplerSetLabel* = proc (sampler: WGPUSampler; label: cstring)
+    WGPUProcSamplerReference* = proc (sampler: WGPUSampler)
+    WGPUProcSamplerRelease* = proc (sampler: WGPUSampler)
   ##  Procs of ShaderModule
   type
     WGPUProcShaderModuleGetCompilationInfo* = proc (
@@ -1416,17 +1433,23 @@ when not defined(WGPU_SKIP_PROCS):
         userdata: pointer)
     WGPUProcShaderModuleSetLabel* = proc (shaderModule: WGPUShaderModule;
         label: cstring)
+    WGPUProcShaderModuleReference* = proc (shaderModule: WGPUShaderModule)
+    WGPUProcShaderModuleRelease* = proc (shaderModule: WGPUShaderModule)
   ##  Procs of Surface
   type
     WGPUProcSurfaceGetPreferredFormat* = proc (surface: WGPUSurface;
         adapter: WGPUAdapter): WGPUTextureFormat
+    WGPUProcSurfaceReference* = proc (surface: WGPUSurface)
+    WGPUProcSurfaceRelease* = proc (surface: WGPUSurface)
   ##  Procs of SwapChain
   type
     WGPUProcSwapChainGetCurrentTextureView* = proc (swapChain: WGPUSwapChain): WGPUTextureView
     WGPUProcSwapChainPresent* = proc (swapChain: WGPUSwapChain)
+    WGPUProcSwapChainReference* = proc (swapChain: WGPUSwapChain)
+    WGPUProcSwapChainRelease* = proc (swapChain: WGPUSwapChain)
   ##  Procs of Texture
   type
-    WGPUProcTextureCreateView* = proc (texture: WGPUTexture; descriptor: ptr WGPUTextureViewDescriptor): WGPUTextureView ##  nullable
+    WGPUProcTextureCreateView* = proc (texture: WGPUTexture; descriptor: ptr WGPUTextureViewDescriptor): WGPUTextureView
     WGPUProcTextureDestroy* = proc (texture: WGPUTexture)
     WGPUProcTextureGetDepthOrArrayLayers* = proc (texture: WGPUTexture): uint32
     WGPUProcTextureGetDimension* = proc (texture: WGPUTexture): WGPUTextureDimension
@@ -1434,13 +1457,17 @@ when not defined(WGPU_SKIP_PROCS):
     WGPUProcTextureGetHeight* = proc (texture: WGPUTexture): uint32
     WGPUProcTextureGetMipLevelCount* = proc (texture: WGPUTexture): uint32
     WGPUProcTextureGetSampleCount* = proc (texture: WGPUTexture): uint32
-    WGPUProcTextureGetUsage* = proc (texture: WGPUTexture): WGPUTextureUsage
+    WGPUProcTextureGetUsage* = proc (texture: WGPUTexture): WGPUTextureUsageFlags
     WGPUProcTextureGetWidth* = proc (texture: WGPUTexture): uint32
     WGPUProcTextureSetLabel* = proc (texture: WGPUTexture; label: cstring)
+    WGPUProcTextureReference* = proc (texture: WGPUTexture)
+    WGPUProcTextureRelease* = proc (texture: WGPUTexture)
   ##  Procs of TextureView
   type
     WGPUProcTextureViewSetLabel* = proc (textureView: WGPUTextureView;
         label: cstring)
+    WGPUProcTextureViewReference* = proc (textureView: WGPUTextureView)
+    WGPUProcTextureViewRelease* = proc (textureView: WGPUTextureView)
 when not defined(WGPU_SKIP_DECLARATIONS):
   proc wgpuCreateInstance*(descriptor: ptr WGPUInstanceDescriptor): WGPUInstance {.
       importc: "wgpuCreateInstance", clib.}
@@ -1458,17 +1485,30 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       importc: "wgpuAdapterGetProperties", clib.}
   proc wgpuAdapterHasFeature*(adapter: WGPUAdapter; feature: WGPUFeatureName): bool {.
       importc: "wgpuAdapterHasFeature", clib.}
-  proc wgpuAdapterRequestDevice*(adapter: WGPUAdapter; descriptor: ptr WGPUDeviceDescriptor; ##  nullable
+  proc wgpuAdapterRequestDevice*(adapter: WGPUAdapter;
+                                 descriptor: ptr WGPUDeviceDescriptor;
                                  callback: WGPURequestDeviceCallback;
                                  userdata: pointer) {.
       importc: "wgpuAdapterRequestDevice", clib.}
+  proc wgpuAdapterReference*(adapter: WGPUAdapter) {.
+      importc: "wgpuAdapterReference", clib.}
+  proc wgpuAdapterRelease*(adapter: WGPUAdapter) {.
+      importc: "wgpuAdapterRelease", clib.}
   ##  Methods of BindGroup
   proc wgpuBindGroupSetLabel*(bindGroup: WGPUBindGroup; label: cstring) {.
       importc: "wgpuBindGroupSetLabel", clib.}
+  proc wgpuBindGroupReference*(bindGroup: WGPUBindGroup) {.
+      importc: "wgpuBindGroupReference", clib.}
+  proc wgpuBindGroupRelease*(bindGroup: WGPUBindGroup) {.
+      importc: "wgpuBindGroupRelease", clib.}
   ##  Methods of BindGroupLayout
   proc wgpuBindGroupLayoutSetLabel*(bindGroupLayout: WGPUBindGroupLayout;
                                     label: cstring) {.
       importc: "wgpuBindGroupLayoutSetLabel", clib.}
+  proc wgpuBindGroupLayoutReference*(bindGroupLayout: WGPUBindGroupLayout) {.
+      importc: "wgpuBindGroupLayoutReference", clib.}
+  proc wgpuBindGroupLayoutRelease*(bindGroupLayout: WGPUBindGroupLayout) {.
+      importc: "wgpuBindGroupLayoutRelease", clib.}
   ##  Methods of Buffer
   proc wgpuBufferDestroy*(buffer: WGPUBuffer) {.importc: "wgpuBufferDestroy",
       clib.}
@@ -1482,7 +1522,7 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       importc: "wgpuBufferGetMappedRange", clib.}
   proc wgpuBufferGetSize*(buffer: WGPUBuffer): uint64 {.
       importc: "wgpuBufferGetSize", clib.}
-  proc wgpuBufferGetUsage*(buffer: WGPUBuffer): WGPUBufferUsage {.
+  proc wgpuBufferGetUsage*(buffer: WGPUBuffer): WGPUBufferUsageFlags {.
       importc: "wgpuBufferGetUsage", clib.}
   proc wgpuBufferMapAsync*(buffer: WGPUBuffer; mode: WGPUMapModeFlags;
                            offset: csize_t; size: csize_t;
@@ -1491,14 +1531,22 @@ when not defined(WGPU_SKIP_DECLARATIONS):
   proc wgpuBufferSetLabel*(buffer: WGPUBuffer; label: cstring) {.
       importc: "wgpuBufferSetLabel", clib.}
   proc wgpuBufferUnmap*(buffer: WGPUBuffer) {.importc: "wgpuBufferUnmap", clib.}
+  proc wgpuBufferReference*(buffer: WGPUBuffer) {.
+      importc: "wgpuBufferReference", clib.}
+  proc wgpuBufferRelease*(buffer: WGPUBuffer) {.importc: "wgpuBufferRelease",
+      clib.}
   ##  Methods of CommandBuffer
   proc wgpuCommandBufferSetLabel*(commandBuffer: WGPUCommandBuffer;
                                   label: cstring) {.
       importc: "wgpuCommandBufferSetLabel", clib.}
+  proc wgpuCommandBufferReference*(commandBuffer: WGPUCommandBuffer) {.
+      importc: "wgpuCommandBufferReference", clib.}
+  proc wgpuCommandBufferRelease*(commandBuffer: WGPUCommandBuffer) {.
+      importc: "wgpuCommandBufferRelease", clib.}
   ##  Methods of CommandEncoder
-  proc wgpuCommandEncoderBeginComputePass*(commandEncoder: WGPUCommandEncoder; descriptor: ptr WGPUComputePassDescriptor): WGPUComputePassEncoder {.
+  proc wgpuCommandEncoderBeginComputePass*(commandEncoder: WGPUCommandEncoder;
+      descriptor: ptr WGPUComputePassDescriptor): WGPUComputePassEncoder {.
       importc: "wgpuCommandEncoderBeginComputePass", clib.}
-    ##  nullable
   proc wgpuCommandEncoderBeginRenderPass*(commandEncoder: WGPUCommandEncoder;
       descriptor: ptr WGPURenderPassDescriptor): WGPURenderPassEncoder {.
       importc: "wgpuCommandEncoderBeginRenderPass", clib.}
@@ -1522,9 +1570,9 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       commandEncoder: WGPUCommandEncoder; source: ptr WGPUImageCopyTexture;
       destination: ptr WGPUImageCopyTexture; copySize: ptr WGPUExtent3D) {.
       importc: "wgpuCommandEncoderCopyTextureToTexture", clib.}
-  proc wgpuCommandEncoderFinish*(commandEncoder: WGPUCommandEncoder; descriptor: ptr WGPUCommandBufferDescriptor): WGPUCommandBuffer {.
+  proc wgpuCommandEncoderFinish*(commandEncoder: WGPUCommandEncoder;
+                                 descriptor: ptr WGPUCommandBufferDescriptor): WGPUCommandBuffer {.
       importc: "wgpuCommandEncoderFinish", clib.}
-    ##  nullable
   proc wgpuCommandEncoderInsertDebugMarker*(commandEncoder: WGPUCommandEncoder;
       markerLabel: cstring) {.importc: "wgpuCommandEncoderInsertDebugMarker",
                               clib.}
@@ -1542,6 +1590,10 @@ when not defined(WGPU_SKIP_DECLARATIONS):
   proc wgpuCommandEncoderWriteTimestamp*(commandEncoder: WGPUCommandEncoder;
       querySet: WGPUQuerySet; queryIndex: uint32) {.
       importc: "wgpuCommandEncoderWriteTimestamp", clib.}
+  proc wgpuCommandEncoderReference*(commandEncoder: WGPUCommandEncoder) {.
+      importc: "wgpuCommandEncoderReference", clib.}
+  proc wgpuCommandEncoderRelease*(commandEncoder: WGPUCommandEncoder) {.
+      importc: "wgpuCommandEncoderRelease", clib.}
   ##  Methods of ComputePassEncoder
   proc wgpuComputePassEncoderBeginPipelineStatisticsQuery*(
       computePassEncoder: WGPUComputePassEncoder; querySet: WGPUQuerySet;
@@ -1571,7 +1623,7 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       importc: "wgpuComputePassEncoderPushDebugGroup", clib.}
   proc wgpuComputePassEncoderSetBindGroup*(
       computePassEncoder: WGPUComputePassEncoder; groupIndex: uint32;
-      group: WGPUBindGroup; dynamicOffsetCount: uint32;
+      group: WGPUBindGroup; dynamicOffsetCount: csize_t;
       dynamicOffsets: ptr uint32) {.importc: "wgpuComputePassEncoderSetBindGroup",
                                     clib.}
   proc wgpuComputePassEncoderSetLabel*(computePassEncoder: WGPUComputePassEncoder;
@@ -1580,6 +1632,10 @@ when not defined(WGPU_SKIP_DECLARATIONS):
   proc wgpuComputePassEncoderSetPipeline*(
       computePassEncoder: WGPUComputePassEncoder; pipeline: WGPUComputePipeline) {.
       importc: "wgpuComputePassEncoderSetPipeline", clib.}
+  proc wgpuComputePassEncoderReference*(computePassEncoder: WGPUComputePassEncoder) {.
+      importc: "wgpuComputePassEncoderReference", clib.}
+  proc wgpuComputePassEncoderRelease*(computePassEncoder: WGPUComputePassEncoder) {.
+      importc: "wgpuComputePassEncoderRelease", clib.}
   ##  Methods of ComputePipeline
   proc wgpuComputePipelineGetBindGroupLayout*(
       computePipeline: WGPUComputePipeline; groupIndex: uint32): WGPUBindGroupLayout {.
@@ -1587,6 +1643,10 @@ when not defined(WGPU_SKIP_DECLARATIONS):
   proc wgpuComputePipelineSetLabel*(computePipeline: WGPUComputePipeline;
                                     label: cstring) {.
       importc: "wgpuComputePipelineSetLabel", clib.}
+  proc wgpuComputePipelineReference*(computePipeline: WGPUComputePipeline) {.
+      importc: "wgpuComputePipelineReference", clib.}
+  proc wgpuComputePipelineRelease*(computePipeline: WGPUComputePipeline) {.
+      importc: "wgpuComputePipelineRelease", clib.}
   ##  Methods of Device
   proc wgpuDeviceCreateBindGroup*(device: WGPUDevice;
                                   descriptor: ptr WGPUBindGroupDescriptor): WGPUBindGroup {.
@@ -1598,7 +1658,6 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       importc: "wgpuDeviceCreateBuffer", clib.}
   proc wgpuDeviceCreateCommandEncoder*(device: WGPUDevice; descriptor: ptr WGPUCommandEncoderDescriptor): WGPUCommandEncoder {.
       importc: "wgpuDeviceCreateCommandEncoder", clib.}
-    ##  nullable
   proc wgpuDeviceCreateComputePipeline*(device: WGPUDevice; descriptor: ptr WGPUComputePipelineDescriptor): WGPUComputePipeline {.
       importc: "wgpuDeviceCreateComputePipeline", clib.}
   proc wgpuDeviceCreateComputePipelineAsync*(device: WGPUDevice;
@@ -1619,9 +1678,9 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       descriptor: ptr WGPURenderPipelineDescriptor;
       callback: WGPUCreateRenderPipelineAsyncCallback; userdata: pointer) {.
       importc: "wgpuDeviceCreateRenderPipelineAsync", clib.}
-  proc wgpuDeviceCreateSampler*(device: WGPUDevice; descriptor: ptr WGPUSamplerDescriptor): WGPUSampler {.
+  proc wgpuDeviceCreateSampler*(device: WGPUDevice;
+                                descriptor: ptr WGPUSamplerDescriptor): WGPUSampler {.
       importc: "wgpuDeviceCreateSampler", clib.}
-    ##  nullable
   proc wgpuDeviceCreateShaderModule*(device: WGPUDevice;
                                      descriptor: ptr WGPUShaderModuleDescriptor): WGPUShaderModule {.
       importc: "wgpuDeviceCreateShaderModule", clib.}
@@ -1643,33 +1702,42 @@ when not defined(WGPU_SKIP_DECLARATIONS):
   proc wgpuDeviceHasFeature*(device: WGPUDevice; feature: WGPUFeatureName): bool {.
       importc: "wgpuDeviceHasFeature", clib.}
   proc wgpuDevicePopErrorScope*(device: WGPUDevice; callback: WGPUErrorCallback;
-                                userdata: pointer): bool {.
+                                userdata: pointer) {.
       importc: "wgpuDevicePopErrorScope", clib.}
   proc wgpuDevicePushErrorScope*(device: WGPUDevice; filter: WGPUErrorFilter) {.
       importc: "wgpuDevicePushErrorScope", clib.}
-  proc wgpuDeviceSetDeviceLostCallback*(device: WGPUDevice;
-                                        callback: WGPUDeviceLostCallback;
-                                        userdata: pointer) {.
-      importc: "wgpuDeviceSetDeviceLostCallback", clib.}
   proc wgpuDeviceSetLabel*(device: WGPUDevice; label: cstring) {.
       importc: "wgpuDeviceSetLabel", clib.}
   proc wgpuDeviceSetUncapturedErrorCallback*(device: WGPUDevice;
       callback: WGPUErrorCallback; userdata: pointer) {.
       importc: "wgpuDeviceSetUncapturedErrorCallback", clib.}
+  proc wgpuDeviceReference*(device: WGPUDevice) {.
+      importc: "wgpuDeviceReference", clib.}
+  proc wgpuDeviceRelease*(device: WGPUDevice) {.importc: "wgpuDeviceRelease",
+      clib.}
   ##  Methods of Instance
   proc wgpuInstanceCreateSurface*(instance: WGPUInstance;
                                   descriptor: ptr WGPUSurfaceDescriptor): WGPUSurface {.
       importc: "wgpuInstanceCreateSurface", clib.}
   proc wgpuInstanceProcessEvents*(instance: WGPUInstance) {.
       importc: "wgpuInstanceProcessEvents", clib.}
-  proc wgpuInstanceRequestAdapter*(instance: WGPUInstance; options: ptr WGPURequestAdapterOptions; ##  nullable
+  proc wgpuInstanceRequestAdapter*(instance: WGPUInstance;
+                                   options: ptr WGPURequestAdapterOptions;
                                    callback: WGPURequestAdapterCallback;
                                    userdata: pointer) {.
       importc: "wgpuInstanceRequestAdapter", clib.}
+  proc wgpuInstanceReference*(instance: WGPUInstance) {.
+      importc: "wgpuInstanceReference", clib.}
+  proc wgpuInstanceRelease*(instance: WGPUInstance) {.
+      importc: "wgpuInstanceRelease", clib.}
   ##  Methods of PipelineLayout
   proc wgpuPipelineLayoutSetLabel*(pipelineLayout: WGPUPipelineLayout;
                                    label: cstring) {.
       importc: "wgpuPipelineLayoutSetLabel", clib.}
+  proc wgpuPipelineLayoutReference*(pipelineLayout: WGPUPipelineLayout) {.
+      importc: "wgpuPipelineLayoutReference", clib.}
+  proc wgpuPipelineLayoutRelease*(pipelineLayout: WGPUPipelineLayout) {.
+      importc: "wgpuPipelineLayoutRelease", clib.}
   ##  Methods of QuerySet
   proc wgpuQuerySetDestroy*(querySet: WGPUQuerySet) {.
       importc: "wgpuQuerySetDestroy", clib.}
@@ -1679,6 +1747,10 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       importc: "wgpuQuerySetGetType", clib.}
   proc wgpuQuerySetSetLabel*(querySet: WGPUQuerySet; label: cstring) {.
       importc: "wgpuQuerySetSetLabel", clib.}
+  proc wgpuQuerySetReference*(querySet: WGPUQuerySet) {.
+      importc: "wgpuQuerySetReference", clib.}
+  proc wgpuQuerySetRelease*(querySet: WGPUQuerySet) {.
+      importc: "wgpuQuerySetRelease", clib.}
   ##  Methods of Queue
   proc wgpuQueueOnSubmittedWorkDone*(queue: WGPUQueue;
                                      callback: WGPUQueueWorkDoneCallback;
@@ -1686,7 +1758,7 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       importc: "wgpuQueueOnSubmittedWorkDone", clib.}
   proc wgpuQueueSetLabel*(queue: WGPUQueue; label: cstring) {.
       importc: "wgpuQueueSetLabel", clib.}
-  proc wgpuQueueSubmit*(queue: WGPUQueue; commandCount: uint32;
+  proc wgpuQueueSubmit*(queue: WGPUQueue; commandCount: csize_t;
                         commands: ptr WGPUCommandBuffer) {.
       importc: "wgpuQueueSubmit", clib.}
   proc wgpuQueueWriteBuffer*(queue: WGPUQueue; buffer: WGPUBuffer;
@@ -1698,6 +1770,16 @@ when not defined(WGPU_SKIP_DECLARATIONS):
                               dataLayout: ptr WGPUTextureDataLayout;
                               writeSize: ptr WGPUExtent3D) {.
       importc: "wgpuQueueWriteTexture", clib.}
+  proc wgpuQueueReference*(queue: WGPUQueue) {.importc: "wgpuQueueReference",
+      clib.}
+  proc wgpuQueueRelease*(queue: WGPUQueue) {.importc: "wgpuQueueRelease", clib.}
+  ##  Methods of RenderBundle
+  proc wgpuRenderBundleSetLabel*(renderBundle: WGPURenderBundle; label: cstring) {.
+      importc: "wgpuRenderBundleSetLabel", clib.}
+  proc wgpuRenderBundleReference*(renderBundle: WGPURenderBundle) {.
+      importc: "wgpuRenderBundleReference", clib.}
+  proc wgpuRenderBundleRelease*(renderBundle: WGPURenderBundle) {.
+      importc: "wgpuRenderBundleRelease", clib.}
   ##  Methods of RenderBundleEncoder
   proc wgpuRenderBundleEncoderDraw*(renderBundleEncoder: WGPURenderBundleEncoder;
                                     vertexCount: uint32; instanceCount: uint32;
@@ -1716,9 +1798,9 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       renderBundleEncoder: WGPURenderBundleEncoder; indirectBuffer: WGPUBuffer;
       indirectOffset: uint64) {.importc: "wgpuRenderBundleEncoderDrawIndirect",
                                 clib.}
-  proc wgpuRenderBundleEncoderFinish*(renderBundleEncoder: WGPURenderBundleEncoder; descriptor: ptr WGPURenderBundleDescriptor): WGPURenderBundle {.
+  proc wgpuRenderBundleEncoderFinish*(renderBundleEncoder: WGPURenderBundleEncoder;
+      descriptor: ptr WGPURenderBundleDescriptor): WGPURenderBundle {.
       importc: "wgpuRenderBundleEncoderFinish", clib.}
-    ##  nullable
   proc wgpuRenderBundleEncoderInsertDebugMarker*(
       renderBundleEncoder: WGPURenderBundleEncoder; markerLabel: cstring) {.
       importc: "wgpuRenderBundleEncoderInsertDebugMarker", clib.}
@@ -1730,7 +1812,7 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       importc: "wgpuRenderBundleEncoderPushDebugGroup", clib.}
   proc wgpuRenderBundleEncoderSetBindGroup*(
       renderBundleEncoder: WGPURenderBundleEncoder; groupIndex: uint32;
-      group: WGPUBindGroup; dynamicOffsetCount: uint32;
+      group: WGPUBindGroup; dynamicOffsetCount: csize_t;
       dynamicOffsets: ptr uint32) {.importc: "wgpuRenderBundleEncoderSetBindGroup",
                                     clib.}
   proc wgpuRenderBundleEncoderSetIndexBuffer*(
@@ -1747,6 +1829,11 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       renderBundleEncoder: WGPURenderBundleEncoder; slot: uint32;
       buffer: WGPUBuffer; offset: uint64; size: uint64) {.
       importc: "wgpuRenderBundleEncoderSetVertexBuffer", clib.}
+  proc wgpuRenderBundleEncoderReference*(
+      renderBundleEncoder: WGPURenderBundleEncoder) {.
+      importc: "wgpuRenderBundleEncoderReference", clib.}
+  proc wgpuRenderBundleEncoderRelease*(renderBundleEncoder: WGPURenderBundleEncoder) {.
+      importc: "wgpuRenderBundleEncoderRelease", clib.}
   ##  Methods of RenderPassEncoder
   proc wgpuRenderPassEncoderBeginOcclusionQuery*(
       renderPassEncoder: WGPURenderPassEncoder; queryIndex: uint32) {.
@@ -1780,7 +1867,7 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       renderPassEncoder: WGPURenderPassEncoder) {.
       importc: "wgpuRenderPassEncoderEndPipelineStatisticsQuery", clib.}
   proc wgpuRenderPassEncoderExecuteBundles*(
-      renderPassEncoder: WGPURenderPassEncoder; bundleCount: uint32;
+      renderPassEncoder: WGPURenderPassEncoder; bundleCount: csize_t;
       bundles: ptr WGPURenderBundle) {.importc: "wgpuRenderPassEncoderExecuteBundles",
                                        clib.}
   proc wgpuRenderPassEncoderInsertDebugMarker*(
@@ -1794,7 +1881,7 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       importc: "wgpuRenderPassEncoderPushDebugGroup", clib.}
   proc wgpuRenderPassEncoderSetBindGroup*(
       renderPassEncoder: WGPURenderPassEncoder; groupIndex: uint32;
-      group: WGPUBindGroup; dynamicOffsetCount: uint32;
+      group: WGPUBindGroup; dynamicOffsetCount: csize_t;
       dynamicOffsets: ptr uint32) {.importc: "wgpuRenderPassEncoderSetBindGroup",
                                     clib.}
   proc wgpuRenderPassEncoderSetBlendConstant*(
@@ -1825,6 +1912,10 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       renderPassEncoder: WGPURenderPassEncoder; x: cfloat; y: cfloat;
       width: cfloat; height: cfloat; minDepth: cfloat; maxDepth: cfloat) {.
       importc: "wgpuRenderPassEncoderSetViewport", clib.}
+  proc wgpuRenderPassEncoderReference*(renderPassEncoder: WGPURenderPassEncoder) {.
+      importc: "wgpuRenderPassEncoderReference", clib.}
+  proc wgpuRenderPassEncoderRelease*(renderPassEncoder: WGPURenderPassEncoder) {.
+      importc: "wgpuRenderPassEncoderRelease", clib.}
   ##  Methods of RenderPipeline
   proc wgpuRenderPipelineGetBindGroupLayout*(renderPipeline: WGPURenderPipeline;
       groupIndex: uint32): WGPUBindGroupLayout {.
@@ -1832,27 +1923,47 @@ when not defined(WGPU_SKIP_DECLARATIONS):
   proc wgpuRenderPipelineSetLabel*(renderPipeline: WGPURenderPipeline;
                                    label: cstring) {.
       importc: "wgpuRenderPipelineSetLabel", clib.}
+  proc wgpuRenderPipelineReference*(renderPipeline: WGPURenderPipeline) {.
+      importc: "wgpuRenderPipelineReference", clib.}
+  proc wgpuRenderPipelineRelease*(renderPipeline: WGPURenderPipeline) {.
+      importc: "wgpuRenderPipelineRelease", clib.}
   ##  Methods of Sampler
   proc wgpuSamplerSetLabel*(sampler: WGPUSampler; label: cstring) {.
       importc: "wgpuSamplerSetLabel", clib.}
+  proc wgpuSamplerReference*(sampler: WGPUSampler) {.
+      importc: "wgpuSamplerReference", clib.}
+  proc wgpuSamplerRelease*(sampler: WGPUSampler) {.
+      importc: "wgpuSamplerRelease", clib.}
   ##  Methods of ShaderModule
   proc wgpuShaderModuleGetCompilationInfo*(shaderModule: WGPUShaderModule;
       callback: WGPUCompilationInfoCallback; userdata: pointer) {.
       importc: "wgpuShaderModuleGetCompilationInfo", clib.}
   proc wgpuShaderModuleSetLabel*(shaderModule: WGPUShaderModule; label: cstring) {.
       importc: "wgpuShaderModuleSetLabel", clib.}
+  proc wgpuShaderModuleReference*(shaderModule: WGPUShaderModule) {.
+      importc: "wgpuShaderModuleReference", clib.}
+  proc wgpuShaderModuleRelease*(shaderModule: WGPUShaderModule) {.
+      importc: "wgpuShaderModuleRelease", clib.}
   ##  Methods of Surface
   proc wgpuSurfaceGetPreferredFormat*(surface: WGPUSurface; adapter: WGPUAdapter): WGPUTextureFormat {.
       importc: "wgpuSurfaceGetPreferredFormat", clib.}
+  proc wgpuSurfaceReference*(surface: WGPUSurface) {.
+      importc: "wgpuSurfaceReference", clib.}
+  proc wgpuSurfaceRelease*(surface: WGPUSurface) {.
+      importc: "wgpuSurfaceRelease", clib.}
   ##  Methods of SwapChain
   proc wgpuSwapChainGetCurrentTextureView*(swapChain: WGPUSwapChain): WGPUTextureView {.
       importc: "wgpuSwapChainGetCurrentTextureView", clib.}
   proc wgpuSwapChainPresent*(swapChain: WGPUSwapChain) {.
       importc: "wgpuSwapChainPresent", clib.}
+  proc wgpuSwapChainReference*(swapChain: WGPUSwapChain) {.
+      importc: "wgpuSwapChainReference", clib.}
+  proc wgpuSwapChainRelease*(swapChain: WGPUSwapChain) {.
+      importc: "wgpuSwapChainRelease", clib.}
   ##  Methods of Texture
-  proc wgpuTextureCreateView*(texture: WGPUTexture; descriptor: ptr WGPUTextureViewDescriptor): WGPUTextureView {.
+  proc wgpuTextureCreateView*(texture: WGPUTexture;
+                              descriptor: ptr WGPUTextureViewDescriptor): WGPUTextureView {.
       importc: "wgpuTextureCreateView", clib.}
-    ##  nullable
   proc wgpuTextureDestroy*(texture: WGPUTexture) {.
       importc: "wgpuTextureDestroy", clib.}
   proc wgpuTextureGetDepthOrArrayLayers*(texture: WGPUTexture): uint32 {.
@@ -1867,12 +1978,20 @@ when not defined(WGPU_SKIP_DECLARATIONS):
       importc: "wgpuTextureGetMipLevelCount", clib.}
   proc wgpuTextureGetSampleCount*(texture: WGPUTexture): uint32 {.
       importc: "wgpuTextureGetSampleCount", clib.}
-  proc wgpuTextureGetUsage*(texture: WGPUTexture): WGPUTextureUsage {.
+  proc wgpuTextureGetUsage*(texture: WGPUTexture): WGPUTextureUsageFlags {.
       importc: "wgpuTextureGetUsage", clib.}
   proc wgpuTextureGetWidth*(texture: WGPUTexture): uint32 {.
       importc: "wgpuTextureGetWidth", clib.}
   proc wgpuTextureSetLabel*(texture: WGPUTexture; label: cstring) {.
       importc: "wgpuTextureSetLabel", clib.}
+  proc wgpuTextureReference*(texture: WGPUTexture) {.
+      importc: "wgpuTextureReference", clib.}
+  proc wgpuTextureRelease*(texture: WGPUTexture) {.
+      importc: "wgpuTextureRelease", clib.}
   ##  Methods of TextureView
   proc wgpuTextureViewSetLabel*(textureView: WGPUTextureView; label: cstring) {.
       importc: "wgpuTextureViewSetLabel", clib.}
+  proc wgpuTextureViewReference*(textureView: WGPUTextureView) {.
+      importc: "wgpuTextureViewReference", clib.}
+  proc wgpuTextureViewRelease*(textureView: WGPUTextureView) {.
+      importc: "wgpuTextureViewRelease", clib.}
