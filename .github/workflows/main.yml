@@ -60,4 +60,25 @@ jobs:
           add: 'src/nimgpu/*'
           message: 'Automatic dawn bindings update'
           push: true
+  emscripten:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.3
+        with:
+          submodules: 'recursive'
       
+      - name: Setup Nim environment
+        uses: jiro4989/setup-nim-action@v1.1.4
+        with:
+          nim-version: 'devel'
+      
+      - name: Generate bindings
+        run: nimble generate_emscripten -y
+      
+      - name: Update repository bindings
+        uses: EndBug/add-and-commit@v9.1.3
+        with:
+          add: 'src/nimgpu/*'
+          message: 'Automatic dawn bindings update'
+          push: true
