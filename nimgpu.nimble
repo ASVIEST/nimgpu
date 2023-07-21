@@ -29,3 +29,4 @@ macro generateTask(name: untyped{ident}, bindings: static string): untyped=
 
 generateTask(generate_wgpu, "wgpu-native")
 generateTask(generate_dawn, "dawn")
+generateTask(generate_emscripten, "emscripten")

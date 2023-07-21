@@ -5,3 +5,6 @@
 [submodule "generator/third_party/dawn"]
 	path = generator/third_party/dawn
 	url = https://dawn.googlesource.com/dawn
+[submodule "generator/third_party/emscripten"]
+	path = generator/third_party/emscripten
+	url = https://github.com/emscripten-core/emscripten
